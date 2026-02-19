@@ -8,28 +8,33 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 
 ## Papers
 
+### Paper I: Phase Space Dimensionality: A Unified Framework for Dark Matter, Consciousness, and Quantum Substrate Requirements
+- **Zenodo:** https://zenodo.org/records/18578012
+- **Summary:** Exploratory brainstorming session proposing speculative connections between dark matter as ordinary matter in adjacent phase space branches, consciousness as a quantum receiver across phase space dimensions, time as a partially opened dimension, and variable physical constants across the multiverse. Builds on earlier work in Radial Dimensionality Theory (RDT). No scripts in this repository; published to document the thinking process and invite collaboration. (No analysis code -- foundational ideas only.)
+
+
 ### Paper II: Testing Radial Dark Matter Fraction Profiles for Quantized Staircase Structure in the Phase Space Dimensionality Framework
-- **Zenodo:** [TODO: insert link]
+- **Zenodo:** https://zenodo.org/records/18604435
 - **Summary:** Tests whether radial dark matter fraction profiles f_DM(R) in 76 SPARC galaxies exhibit a "staircase morphology" (discrete plateaus connected by sharp transitions) as predicted by the RDT framework. Five independent statistical tests on 1,830 radial data points find no staircase signature, constraining step heights to Delta f_DM < 0.02.
 
 ### Paper III: Dark Matter as Superimposed Cosmic Webs: A Methodology for Testing Independent Structure Formation Across psi-Branches
-- **Zenodo:** [TODO: insert link]
+- **Zenodo:** https://zenodo.org/records/18612335
 - **Summary:** Develops the ISF hypothesis and tests it using 84 SPARC galaxies. Detects apparent spatial autocorrelation (Moran's I = 0.67) but finds it entirely attributable to galaxy group membership after deconfounding. Proposes three follow-up tests: spectroscopic survey residual autocorrelation, weak lensing power spectrum suppression, and strong lensing dark substructure.
 
 ### Paper IV: Testing Independent Structure Formation Across psi-Branches with 258,000 BOSS Galaxies
-- **Zenodo:** [TODO: insert link]
+- **Zenodo:** https://zenodo.org/records/18627110
 - **Summary:** Scales the ISF spatial autocorrelation test to 258,153 BOSS DR12 LOWZ galaxies. Random forest regression explains 91.3% of f_DM variance. Three diagnostic tests identify the residual signal as redshift systematic rather than genuine ISF structure, yielding a clean null result for ISF spatial autocorrelation.
 
 ### Paper V: Weak Lensing Constraints on Cross-Branch Correlations in the Independent Structure Formation Framework
-- **Zenodo:** [TODO: insert link]
+- **Zenodo:** https://zenodo.org/records/18634086
 - **Summary:** Tests ISF against published weak lensing measurements. The ISF power spectrum modification factor [1 + (N-1)*epsilon(k)]/N is constrained using the S8 tension. ISF models with scale-dependent epsilon(k) are preferred over constant suppression at 1.9 sigma, with best-fit parameters k_t = 0.20 h/Mpc and epsilon_inf = 0.58.
 
 ### Paper VI: Galaxy-Mass Dark Substructure from Strong Lensing: A Parameter-Free Test of Independent Structure Formation
-- **Zenodo:** [TODO: insert link]
+- **Zenodo:** https://zenodo.org/records/18637044
 - **Summary:** Derives parameter-free predictions for ISF dark perturbers detectable via strong gravitational lensing. Predicts ~1.08 detectable dark perturbers per lens sightline (10^10-10^12 solar masses) with a Schechter-shaped mass function. Provides partial explanation (63%) for the Meneghetti galaxy-galaxy strong lensing anomaly. Forecasts ~4,000 detectable ISF perturbers with Euclid.
 
 ### Paper VII: Joint Weak Lensing and Strong Lensing Substructure Constraints on ISF Cross-Branch Correlation Parameters -- A Euclid Forecast for Decisive Falsification
-- **Zenodo:** [TODO: insert link]
+- **Zenodo:** https://zenodo.org/records/18644812
 - **Summary:** Presents the first joint constraint from weak lensing (KiDS-1000 band powers) and strong lensing substructure. Joint best-fit: N = 10, k_t = 1.32 h/Mpc apparent (0.52 h/Mpc physical after Limber correction), with Delta chi^2 = -53.6 vs LCDM (~7.3 sigma equivalent). Euclid forecast shows 33 sigma discrimination between N=2 and N=6; if no ISF substructure is detected, all ISF models are excluded at > 62 sigma.
 
 ---
