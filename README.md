@@ -37,6 +37,10 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 - **Zenodo:** https://zenodo.org/records/18644812
 - **Summary:** Presents the first joint constraint from weak lensing (KiDS-1000 band powers) and strong lensing substructure. Joint best-fit: N = 10, k_t = 1.32 h/Mpc apparent (0.52 h/Mpc physical after Limber correction), with Delta chi^2 = -53.6 vs LCDM (~7.3 sigma equivalent). Euclid forecast shows 33 sigma discrimination between N=2 and N=6; if no ISF substructure is detected, all ISF models are excluded at > 62 sigma.
 
+### Paper VIII: Anchoring the Falsification Forecast to Measured Euclid Q1 Strong-Lens Demographics
+- **Zenodo:** (pending)
+- **Summary:** Replaces the three assumed survey inputs of Paper VII's Euclid forecast (75,000 grade-A/B lenses, flat eta = 0.05) with quantities measured from the public Q1 Strong Lensing Discovery Engine catalogue (497 grade-A/B candidates at 7.88/deg^2; Einstein-radius median 0.88"). The recalibrated forecast is robust and slightly strengthened: 4,463-5,955 expected fiducial detections (vs 4,050 assumed), with the all-ISF 95% falsification threshold rising from 1,844 to 2,037-2,733 detections. Staging over real release dates shows DR1 falsifies (a null search excludes all ISF at >= 24 sigma) but cannot confirm (an ISF-true count leaves the posterior at N=10; only the full wide survey collapses it to N=6). A perturber search of the 312 already-modelled Q1 systems would exclude N >= 6 at >= 5 sigma if null.
+
 ---
 
 ## Repository Structure
@@ -54,6 +58,9 @@ phase_space_research/
 |       |-- lnL_sub_grid.npz           # Substructure likelihood grid
 |       |-- joint_constraint.npz       # Joint constraint results
 |       |-- euclid_forecast.npz        # Euclid forecast predictions
+|   |-- paper8/                   # Precomputed data products (Paper VIII)
+|       |-- q1_demographics.npz        # Q1 SLDE demographics (rates, theta_E)
+|       |-- recalibrated_forecast.npz  # Recalibrated forecast grids
 |
 |-- paper2_radial_profiles/       # Paper II scripts
 |   |-- step1_radial.py           # Compute f_DM(R) for all SPARC galaxies
@@ -126,6 +133,11 @@ phase_space_research/
 |   |-- phase5/
 |       |-- step5a_euclid_forecast.py     # Euclid Fisher forecast
 |       |-- step5b_forecast_figure.py     # Forecast visualization
+|
+|-- paper8_euclid_q1/             # Paper VIII scripts
+|   |-- step1_q1_demographics.py  # Q1 SLDE catalogue demographics
+|   |-- step2_recalibrated_forecast.py  # Forecast with measured inputs
+|   |-- step3_figures.py          # Paper figures
 ```
 
 ---
@@ -144,6 +156,9 @@ These can be obtained from the [SDSS DR12 BOSS LSS catalogs](https://data.sdss.o
 
 ### KiDS-1000 (Paper VII)
 The KiDS-1000 cosmic shear band power data used in Paper VII is included as preprocessed `.npz` files in `data/paper7/`. The original KiDS-1000 data release is available from [kids.strw.leidenuniv.nl](https://kids.strw.leidenuniv.nl/DR4/lensing.php).
+
+### Euclid Q1 Strong Lensing Discovery Engine (Paper VIII)
+The Q1 SLDE lens catalogue and automated mass models (Walmsley et al. 2025, arXiv:2503.15324) are not redistributed here; download `q1_discovery_engine_lens_catalog.csv` and `modeling_lens_mass.csv` from the Euclid Collaboration's public record at [Zenodo 10.5281/zenodo.15003116](https://doi.org/10.5281/zenodo.15003116). Derived demographics are included as `.npz` files in `data/paper8/`. See `paper8_euclid_q1/README.md` for the expected directory layout.
 
 ### Published Lensing Measurements (Paper V)
 Compiled from Amon+2023, Leauthaud+2017, Efstathiou+2022, and major weak lensing survey S8 results. See `paper5_weak_lensing/compile_published_data.py` for details and references.
