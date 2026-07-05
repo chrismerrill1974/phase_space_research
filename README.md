@@ -41,6 +41,10 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 - **Zenodo:** (pending)
 - **Summary:** Replaces the three assumed survey inputs of Paper VII's Euclid forecast (75,000 grade-A/B lenses, flat eta = 0.05) with quantities measured from the public Q1 Strong Lensing Discovery Engine catalogue (497 grade-A/B candidates at 7.88/deg^2; Einstein-radius median 0.88"). The recalibrated forecast is robust and slightly strengthened: 4,463-5,955 expected fiducial detections (vs 4,050 assumed), with the all-ISF 95% falsification threshold rising from 1,844 to 2,037-2,733 detections. Staging over real release dates shows DR1 falsifies (a null search excludes all ISF at >= 24 sigma) but cannot confirm (an ISF-true count leaves the posterior at N=10; only the full wide survey collapses it to N=6). A perturber search of the 312 already-modelled Q1 systems would exclude N >= 6 at >= 5 sigma if null.
 
+### Paper IX: Black Holes as Branch-Blind Objects -- A Gravitational-Capture Origin for the ISF Cross-Branch Correlation
+- **Zenodo:** (pending)
+- **Summary:** Theory paper proposing a physical origin for the fitted correlation function epsilon(k): branches co-locate by falling into shared gravitational wells, with black holes as the unique branch-blind objects (the no-hair theorem erases every branch-distinguishing attribute). The capture mechanism reproduces the sigmoid shape, recovers the fitted transition scale to a factor of 2.1 with no free parameters (k_NL(0) = 0.25 vs fitted k_t = 0.52 h/Mpc), and predicts eps_inf(z=1)/eps_inf(0) = 0.45-0.70 -- testable with Euclid DR1 tomography from 2027. Black-hole growth accounting bounds the cross-branch capture efficiency to gamma < 0.19 at N=6 (Soltan argument) while the maximal early excess reaches the low edge of the JWST z>6 overmassive anomaly at N=10. Revises the redshift-independence discriminant of Papers V-VIII.
+
 ---
 
 ## Repository Structure
@@ -61,6 +65,10 @@ phase_space_research/
 |   |-- paper8/                   # Precomputed data products (Paper VIII)
 |       |-- q1_demographics.npz        # Q1 SLDE demographics (rates, theta_E)
 |       |-- recalibrated_forecast.npz  # Recalibrated forecast grids
+|   |-- paper9/                   # Data products (Paper IX)
+|       |-- pknl_camb.npz              # Linear P(k,z) input (from Paper VII)
+|       |-- eps_evolution.npz          # eps_inf(z), k_NL(z) predictions
+|       |-- bh_accounting.npz          # Soltan gamma(N) bounds
 |
 |-- paper2_radial_profiles/       # Paper II scripts
 |   |-- step1_radial.py           # Compute f_DM(R) for all SPARC galaxies
@@ -137,6 +145,11 @@ phase_space_research/
 |-- paper8_euclid_q1/             # Paper VIII scripts
 |   |-- step1_q1_demographics.py  # Q1 SLDE catalogue demographics
 |   |-- step2_recalibrated_forecast.py  # Forecast with measured inputs
+|   |-- step3_figures.py          # Paper figures
+|
+|-- paper9_blackholes/            # Paper IX scripts (theory)
+|   |-- step1_eps_evolution.py    # Capture mechanism: eps_inf(z), k_t(z)
+|   |-- step2_bh_accounting.py    # Soltan gamma(N) bound, JWST headroom
 |   |-- step3_figures.py          # Paper figures
 ```
 
