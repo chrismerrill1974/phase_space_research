@@ -38,11 +38,11 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 - **Summary:** Presents the first joint constraint from weak lensing (KiDS-1000 band powers) and strong lensing substructure. Joint best-fit: N = 10, k_t = 1.32 h/Mpc apparent (0.52 h/Mpc physical after Limber correction), with Delta chi^2 = -53.6 vs LCDM (~7.3 sigma equivalent). Euclid forecast shows 33 sigma discrimination between N=2 and N=6; if no ISF substructure is detected, all ISF models are excluded at > 62 sigma.
 
 ### Paper VIII: Anchoring the Falsification Forecast to Measured Euclid Q1 Strong-Lens Demographics
-- **Zenodo:** (pending)
+- **Zenodo:** https://zenodo.org/records/21195841
 - **Summary:** Replaces the three assumed survey inputs of Paper VII's Euclid forecast (75,000 grade-A/B lenses, flat eta = 0.05) with quantities measured from the public Q1 Strong Lensing Discovery Engine catalogue (497 grade-A/B candidates at 7.88/deg^2; Einstein-radius median 0.88"). The recalibrated forecast is robust and slightly strengthened: 4,463-5,955 expected fiducial detections (vs 4,050 assumed), with the all-ISF 95% falsification threshold rising from 1,844 to 2,037-2,733 detections. Staging over real release dates shows DR1 falsifies (a null search excludes all ISF at >= 24 sigma) but cannot confirm (an ISF-true count leaves the posterior at N=10; only the full wide survey collapses it to N=6). A perturber search of the 312 already-modelled Q1 systems would exclude N >= 6 at >= 5 sigma if null.
 
 ### Paper IX: Black Holes as Branch-Blind Objects -- A Gravitational-Capture Origin for the ISF Cross-Branch Correlation
-- **Zenodo:** (pending)
+- **Zenodo:** https://zenodo.org/records/21209225
 - **Summary:** Theory paper proposing a physical origin for the fitted correlation function epsilon(k): branches co-locate by falling into shared gravitational wells, with black holes as the unique branch-blind objects (the no-hair theorem erases every branch-distinguishing attribute). The capture mechanism reproduces the sigmoid shape, recovers the fitted transition scale to a factor of 2.1 with no free parameters (k_NL(0) = 0.25 vs fitted k_t = 0.52 h/Mpc), and predicts eps_inf(z=1)/eps_inf(0) = 0.45-0.70 -- testable with Euclid DR1 tomography from 2027. Black-hole growth accounting bounds the cross-branch capture efficiency to gamma < 0.19 at N=6 (Soltan argument) while the maximal early excess reaches the low edge of the JWST z>6 overmassive anomaly at N=10. Revises the redshift-independence discriminant of Papers V-VIII.
 
 ---
