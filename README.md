@@ -47,7 +47,7 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 
 ### Paper X: The Galaxy-Scale Dark Mass Profile Under Independent Structure Formation -- A Dated Prediction for the Milky Way's Outer Rotation Curve, and a Corrected Threshold for the Euclid Perturber Search
 - **Zenodo:** (pending)
-- **Summary:** Theory paper deriving the dark mass profile around a single galaxy from the Paper IX capture ontology, motivated by the Gaia DR3 debate over a declining Milky Way rotation curve. Shows that other-branch diffuse gas cannot be the halo (an isothermal atmosphere holds the halo mass only above the virial temperature, where it is too diffuse: 177-179 km/s at the solar radius against 230 measured), so captured other-branch collapsed matter carries it. With M_cap = (N-1) eps_inf(N) M_bar from the series' own numbers, N = 2 is excluded by the inner rotation curve, N = 6 reaches the solar-radius speed with a 20 kpc extent and nothing tuned, and the outer slope follows from N alone: beta(15-30 kpc) = -0.42, -0.30, -0.22, -0.17 for N = 4, 6, 8, 10, with a dip near 100 kpc that external galaxies test. That prediction is already excluded by the external population: of 21 SPARC spirals with Milky-Way rotation speeds, none has a slope at or below -0.17 (median -0.01), a published null for the registered model; the family with other branches holding twice our collapsed mass per well survives at N = 8-10 (N = 8 brackets both Milky Way stream masses at the edge of the SPARC band; N = 10 sits in the band and overshoots the streams) and predicts a mild Milky Way decline (-0.13 to -0.05) for Gaia DR4 (2 December 2026). Replacing Paper VI's intact-NFW perturber changes the Euclid Q1 in-principle expectation at N = 6 from 12.6-16.8 to 8.8-19.6 detections (4.2-6.3 sigma null test), bracketed over the perturber's extent.
+- **Summary:** Theory paper deriving the dark mass profile around a single galaxy from the Paper IX capture ontology, motivated by the Gaia DR3 debate over a declining Milky Way rotation curve. Shows that other-branch diffuse gas cannot be the halo (an isothermal atmosphere holds the halo mass only above the virial temperature, where it is too diffuse: 177-179 km/s at the solar radius against 230 measured), so captured other-branch collapsed matter carries it. With M_cap = (N-1) eps_inf(N) M_bar from the series' own numbers, N = 2 is excluded by the inner rotation curve, N = 6 reaches the solar-radius speed with a 20 kpc extent and nothing tuned, and the outer slope follows from N alone: beta(15-30 kpc) = -0.42, -0.30, -0.22, -0.17 for N = 4, 6, 8, 10, with a dip near 100 kpc that external galaxies test. That prediction is already excluded by the external population: run galaxy by galaxy for 20 SPARC spirals with Milky-Way rotation speeds, no galaxy falls at or below its own prediction at N <= 8 (sign-test P < 0.001) and four of twenty do at N = 10 (P = 0.006), a published null for the registered model. The family with other branches holding two to three times our collapsed mass per well survives: (N, m) = (10, 2) and (8, 3) fit the population while the Milky Way's streams prefer (8, 2), so the family spans one step in N, and the Milky Way's outer slope (-0.13 to -0.05 across it) discriminates within it for Gaia DR4 (2 December 2026). For the Euclid Q1 in-principle test the family gives 6.5-8.9 expected detections with the perturber extent held and 15-22 scaled (3.6-6.6 sigma null test).
 
 ---
 
@@ -80,6 +80,8 @@ phase_space_research/
 |       |-- combined_halo_m2.npz       # Step 2b at m = 2 (twice our collapsed mass per branch)
 |       |-- perturber_profile.npz      # Step 3: perturber threshold, Paper XI numbers
 |       |-- sparc_mw_mass_slopes.npz   # Step 5: SPARC Milky-Way-mass outer slopes
+|       |-- sparc_per_galaxy_chain.npz  # Step 5b: the chain per SPARC galaxy (main test)
+|       |-- perturber_profile_m2.npz, perturber_profile_m3.npz  # Step 3 at the family's extents
 |       |-- joint_constraint_paper7.npz, euclid_forecast_paper7.npz,
 |       |   q1_demographics_paper8.npz, paper6_phase2_results.json  # inputs (series products)
 |
@@ -171,6 +173,7 @@ phase_space_research/
 |   |-- step2b_combine_hot_remainder.py  # Hot remainder added, curve to R_200
 |   |-- step3_perturber_profile.py       # Perturber profile, Paper XI threshold
 |   |-- step5_sparc_mw_mass_slopes.py    # SPARC outer slopes, Milky-Way-mass spirals
+|   |-- step5b_sparc_per_galaxy_chain.py # The chain per SPARC galaxy (main test)
 |   |-- step4_figures.py                 # Paper figures
 ```
 

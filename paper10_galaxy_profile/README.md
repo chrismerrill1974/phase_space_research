@@ -39,8 +39,16 @@ threshold for the Euclid Q1 perturber search (Paper XI).
   at least three points spanning 8 kpc (21 galaxies), plus a scaled
   6-13 disc-scale-length selection. Inputs: the two SPARC tables in
   `data/sparc/` (in this repo). Output: `sparc_mw_mass_slopes.npz`.
-- `step4_figures.py` — Produces the four paper figures (Fig 3b reads
-  the step 5 output for the SPARC band).
+- `step5b_sparc_per_galaxy_chain.py` — The paper's main test since the
+  second review: the captured-component chain run for each SPARC galaxy
+  from its own baryonic curve (SPARC mass-to-light 0.5 for the disc,
+  bracketed 0.3/0.7; anchor 8.178 kpc, bracketed 3 R_disk), gated on
+  reproducing the Milky Way chain; observed minus predicted slopes per
+  (N, m) with a one-sided sign test. Output: `sparc_per_galaxy_chain.npz`.
+- `step3_perturber_profile.py --m 2|3` anchors the perturber extent on the
+  surviving family's chain (outputs `perturber_profile_m{2,3}.npz`).
+- `step4_figures.py` — Produces the five paper figures (Fig 3b reads the
+  step 5 output for the SPARC band; Fig 5 reads step 5b).
 
 ## Expected directory layout
 

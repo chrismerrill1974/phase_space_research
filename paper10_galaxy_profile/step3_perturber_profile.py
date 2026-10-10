@@ -54,6 +54,7 @@ Runtime: seconds (the convergence integrals are the slow part).
 import os
 import sys
 import json
+import argparse
 import numpy as np
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
@@ -62,7 +63,11 @@ from scipy.optimize import brentq
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 DATA = os.path.join(ROOT, 'data')
-OUTPATH = os.path.join(DATA, 'perturber_profile.npz')
+_ap = argparse.ArgumentParser(description='ISF perturber profile and the Paper XI threshold')
+_ap.add_argument('--m', type=int, default=1, choices=[1, 2, 3],
+                 help='anchor the perturber extent on the step 2 chain at this branch mass (default 1)')
+M_BRANCH = _ap.parse_args().m
+OUTPATH = os.path.join(DATA, 'perturber_profile.npz' if M_BRANCH == 1 else f'perturber_profile_m{M_BRANCH}.npz')
 
 # ═══════════════════════════════════════════════════════════════════
 # Paper VI functions, reproduced with their exact constants
@@ -198,7 +203,9 @@ if not (g1 and g2 and g3):
 # The ISF perturber profile and the aperture-mass threshold
 # ═══════════════════════════════════════════════════════════════════
 h2 = np.load(os.path.join(DATA, 'dissipated_component.npz'))
-RH_MW = h2['rh_pred']                    # per N in h2['N_GRID'] (nan for N=2,3)
+RH_MW = h2['rh_pred'] if M_BRANCH == 1 else h2['rh_pred_m23'][M_BRANCH - 2]   # per N; nan where no anchor
+print(f"  perturber extents anchored on the step 2 chain at m = {M_BRANCH}: "
+      + ", ".join(f"N={n}: {r:.1f} kpc" for n, r in zip(N_GRID, RH_MW) if np.isfinite(r)))
 assert np.array_equal(h2['N_GRID'].astype(int), N_GRID)
 F_MW = h2['f_avail_m1']
 M_MW_WELL = 1.5e12                       # anchor well for scaling (i)

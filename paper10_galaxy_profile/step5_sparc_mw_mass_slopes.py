@@ -30,6 +30,7 @@ Runtime: under a second.
 """
 
 import os
+import sys
 import numpy as np
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -55,7 +56,7 @@ def tokens(path, n_min):
 # ── Table 1: galaxy properties (columns in header order) ───────────
 gal = {}
 for t in tokens(os.path.join(DATA, 'sparc', 'SPARC_Lelli2016c.mrt'), 18):
-    gal[t[0]] = dict(T=int(t[1]), D=float(t[2]), inc=float(t[5]), Rdisk=float(t[11]),
+    gal[t[0]] = dict(T=int(t[1]), D=float(t[2]), e_D=float(t[3]), inc=float(t[5]), Rdisk=float(t[11]),
                      Vflat=float(t[15]), e_Vflat=float(t[16]), Q=int(t[17]))
 
 # ── Mass models: rotation curves ────────────────────────────────────
@@ -120,6 +121,72 @@ b_scaled, eb_scaled = report(rows_scaled, f"Scaled radii {RD_LO:.0f}-{RD_HI:.0f}
 print("\nPaper X predictions for Milky-Way-mass spirals, beta(15-30 kpc): "
       + ", ".join(f"N={N}: {v:+.2f}" for N, v in PRED.items()) + f"; NFW c=12 at 1e12: {NFW_REF:+.3f}")
 
+
+# ═══════════════════════════════════════════════════════════════════
+# Systematics (added after the second peer review, 2026-10-10, findings
+# 4 and 5): the median carries the claim; its uncertainty and the
+# sensitivity to weighting, selection, window and distance are reported.
+# ═══════════════════════════════════════════════════════════════════
+rng = np.random.default_rng(20261010)
+names_p = [r[0] for r in rows_phys]
+def slopes_for(sel_names, lo=R_LO, hi=R_HI, dscale=None, perturb=False):
+    out = []
+    for n in sel_names:
+        R, V, eV = rc[n].T
+        if dscale is not None:
+            R = R * dscale[n]
+        if perturb:
+            V = V + rng.normal(0.0, eV)
+        sel = (R >= lo) & (R <= hi)
+        if sel.sum() >= N_MIN and (R[sel].max() - R[sel].min()) >= SPAN_MIN * (hi - lo) / (R_HI - R_LO):
+            out.append(slope(R[sel], V[sel], eV[sel])[0])
+    return np.array(out)
+
+print("\nSYSTEMATICS on the physical-radius sample (the median carries the claim):")
+b_unw = []
+for n in names_p:
+    R, V, eV = rc[n].T; sel = (R >= R_LO) & (R <= R_HI)
+    b_unw.append(np.polyfit(np.log(R[sel]), np.log(V[sel]), 1)[0])
+b_unw = np.array(b_unw)
+print(f"  weighted median {np.median(b_phys):+.3f}; unweighted median {np.median(b_unw):+.3f}")
+NMC = 2000
+mc_med = np.empty(NMC); mc_min = np.empty(NMC)
+for k in range(NMC):
+    bb = slopes_for(names_p, perturb=True)
+    mc_med[k] = np.median(bb); mc_min[k] = bb.min()
+print(f"  Monte Carlo over the quoted velocity errors ({NMC} draws): median = {mc_med.mean():+.3f} +/- {mc_med.std():.3f};"
+      f" P(at least one galaxy <= -0.17) = {(mc_min <= -0.17).mean():.2f}; P(median <= -0.17) = {(mc_med <= -0.17).mean():.3f}")
+# leave the outermost in-window point out
+b_loo = []
+for n in names_p:
+    R, V, eV = rc[n].T; sel = (R >= R_LO) & (R <= R_HI)
+    idx = np.where(sel)[0][:-1]
+    if len(idx) >= N_MIN and (R[idx].max() - R[idx].min()) >= SPAN_MIN:
+        b_loo.append(slope(R[idx], V[idx], eV[idx])[0])
+b_loo = np.array(b_loo)
+print(f"  outermost window point dropped: {len(b_loo)} galaxies, median {np.median(b_loo):+.3f}, min {b_loo.min():+.3f}")
+# peak-speed selection (V_flat is low or zero for declining curves)
+peak = [n for n, g in gal.items() if g['Q'] <= Q_MAX and g['inc'] >= INC_MIN and n in rc
+        and VFLAT_LO <= rc[n][:, 1].max() <= VFLAT_HI]
+b_peak = slopes_for(peak)
+added = [n for n in peak if n not in base]
+b_added = {n: slopes_for([n]) for n in added}
+print(f"  selection on peak V_obs in [{VFLAT_LO:.0f},{VFLAT_HI:.0f}] instead of V_flat: {len(b_peak)} galaxies, median {np.median(b_peak):+.3f};"
+      f" galaxies added: " + ", ".join(f"{n} ({b_added[n][0]:+.2f})" for n in added if len(b_added[n])))
+b_1525 = slopes_for(names_p, lo=15.0, hi=25.0)
+print(f"  window 15-25 kpc: {len(b_1525)} galaxies, median {np.median(b_1525):+.3f}")
+for sign, lab in ((-1, 'down'), (+1, 'up')):
+    dscale = {n: (gal[n]['D'] + sign * gal[n]['e_D']) / gal[n]['D'] for n in names_p}
+    bd = slopes_for(names_p, dscale=dscale)
+    print(f"  every distance shifted {lab} by its quoted error (coherent worst case): {len(bd)} galaxies, median {np.median(bd):+.3f}")
+n_beyond25 = sum(((rc[n][:, 0] > 25.0) & (rc[n][:, 0] <= 30.0)).sum() <= 2 for n in names_p)
+print(f"  galaxies with at most two points in 25-30 kpc: {n_beyond25} of {len(names_p)}")
+print("  pressure support is neglected in V_obs; at these speeds it is a percent-level effect on the slope.")
+sys_out = dict(median_unweighted=np.median(b_unw), mc_median_mean=mc_med.mean(), mc_median_std=mc_med.std(),
+               mc_p_any_below=(mc_min <= -0.17).mean(), loo_median=np.median(b_loo), loo_min=b_loo.min(), n_loo=len(b_loo),
+               peak_n=len(b_peak), peak_median=np.median(b_peak), w1525_n=len(b_1525), w1525_median=np.median(b_1525),
+               n_beyond25=n_beyond25)
+
 np.savez(OUTPATH,
          names_phys=np.array([r[0] for r in rows_phys]), vflat_phys=np.array([r[1] for r in rows_phys]),
          rmax_phys=np.array([r[2] for r in rows_phys]), npts_phys=np.array([r[3] for r in rows_phys]),
@@ -128,5 +195,6 @@ np.savez(OUTPATH,
          rdisk_scaled=np.array([r[2] for r in rows_scaled]), npts_scaled=np.array([r[3] for r in rows_scaled]),
          beta_scaled=b_scaled, err_scaled=eb_scaled,
          selection=np.array([VFLAT_LO, VFLAT_HI, Q_MAX, INC_MIN, R_LO, R_HI, N_MIN, SPAN_MIN, RD_LO, RD_HI]),
-         pred_N=np.array(list(PRED.keys())), pred_beta=np.array(list(PRED.values())), nfw_ref=NFW_REF)
+         pred_N=np.array(list(PRED.keys())), pred_beta=np.array(list(PRED.values())), nfw_ref=NFW_REF,
+         **{f'sys_{k}': v for k, v in sys_out.items()})
 print(f"\nSaved {OUTPATH}")

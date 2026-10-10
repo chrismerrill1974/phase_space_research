@@ -192,9 +192,32 @@ ax2.plot([], [], 'o', color='k', label='$m=1$, with hot remainder (range over $M
 ax2.plot([], [], 'x', color='k', label='$m=1$, captured + baryons')
 ax2.set_xlim(3, 12.2); ax2.set_ylim(-0.62, 0.10); ax2.set_xticks([4, 6, 8, 10])
 ax2.set_xlabel('number of branches $N$'); ax2.set_ylabel(r'$\beta = d\ln v_c/d\ln R$ at 15–30 kpc')
-ax2.set_title('(b) the outer slope follows from $N$', fontsize=9.5)
+ax2.set_title('(b) the outer slope follows from $N$ and $m$', fontsize=9.5)
 ax2.legend(loc='lower right', fontsize=6.8, bbox_to_anchor=(1.0, 0.0), borderaxespad=0.3)
 save(fig, 'fig3_curves_and_slope')
+
+# ── Figure 5: the chain per SPARC galaxy (step 5b) ───────────────────
+h5b = np.load(os.path.join(DATA, 'sparc_per_galaxy_chain.npz'), allow_pickle=True)
+cases = [tuple(c) for c in h5b['cases']]; obs = h5b['fid_obs']; pred = h5b['fid_pred']; summ = h5b['summary']
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.2, 3.8))
+for c, mk, col, lab in (((10, 1), 'x', '#882255', '$(N,m)=(10,1)$'), ((10, 2), '^', '#2255aa', '$(N,m)=(10,2)$')):
+    k = cases.index(c); ok = np.isfinite(pred[k])
+    ax1.plot(pred[k][ok], obs[ok], mk, color=col, ms=7, mew=1.4, ls='none', label=lab)
+ax1.plot([-0.5, 0.3], [-0.5, 0.3], color='k', lw=0.8, ls=':'); ax1.text(0.17, 0.2, 'equality', fontsize=7.5)
+ax1.set_xlim(-0.5, 0.3); ax1.set_ylim(-0.5, 0.3)
+ax1.set_xlabel(r"predicted $\beta$(15–30 kpc), from the galaxy's own baryons"); ax1.set_ylabel(r'observed $\beta$(15–30 kpc)')
+ax1.set_title('(a) 20 SPARC spirals, $V_f$ = 180–260 km/s', fontsize=9.5); ax1.legend(loc='upper left')
+labels = [f'({N},{m})' for N, m in cases]; x = np.arange(len(cases))
+med = summ[:, 1]; lo = summ[:, 2]; hi = summ[:, 3]
+ax2.errorbar(x, med, yerr=[med - lo, hi - med], fmt='o', color='k', ms=5, capsize=3, lw=1.2)
+ax2.axhline(0, color=GREY, lw=0.8, ls=':')
+for i, c in enumerate(cases):
+    k = int(summ[i, 4]); n = int(summ[i, 0]); P = summ[i, 5]
+    ax2.text(x[i], hi[i] + 0.02, f'{k}/{n}\n' + (f'P={P:.3f}' if P >= 1e-3 else 'P<0.001'), ha='center', fontsize=6.8)
+ax2.set_xticks(x); ax2.set_xticklabels(labels, fontsize=8); ax2.set_ylim(-0.2, 0.5)
+ax2.set_xlabel('$(N, m)$'); ax2.set_ylabel(r'observed $-$ predicted $\beta$: median, 16–84%')
+ax2.set_title('(b) galaxies at or below their own prediction, and the sign test', fontsize=9.5)
+save(fig, 'fig5_per_galaxy')
 
 # ── Figure 4: perturber convergence and the Paper XI numbers ───────
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.2, 3.8))
