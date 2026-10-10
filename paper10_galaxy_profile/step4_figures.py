@@ -208,15 +208,15 @@ for c, mk, col, lab in (((10, 1), 'x', '#882255', '$(N,m)=(10,1)$'), ((10, 2), '
 ax1.plot([-0.5, 0.3], [-0.5, 0.3], color='k', lw=0.8, ls=':'); ax1.text(0.17, 0.2, 'equality', fontsize=7.5)
 ax1.set_xlim(-0.5, 0.3); ax1.set_ylim(-0.5, 0.3)
 ax1.set_xlabel(r"predicted $\beta$(15–30 kpc), from the galaxy's own baryons"); ax1.set_ylabel(r'observed $\beta$(15–30 kpc)')
-ax1.set_title('(a) 20 SPARC spirals, $V_f$ = 180–260 km/s', fontsize=9.5); ax1.legend(loc='upper left')
+ax1.set_title('(a) 20 SPARC spirals, $V_f$ = 180–260 km/s', fontsize=9.5); ax1.legend(loc='lower right')
 labels = [f'({N},{m})' for N, m in cases]; x = np.arange(len(cases))
 med = summ[:, 1]; lo = summ[:, 2]; hi = summ[:, 3]
 ax2.errorbar(x, med, yerr=[med - lo, hi - med], fmt='o', color='k', ms=5, capsize=3, lw=1.2)
 ax2.axhline(0, color=GREY, lw=0.8, ls=':')
 for i, c in enumerate(cases):
     k = int(summ[i, 4]); n = int(summ[i, 0]); P = summ[i, 5]
-    ax2.text(x[i], hi[i] + 0.02, f'{k}/{n}\n' + (f'P={P:.3f}' if P >= 1e-3 else 'P<0.001'), ha='center', fontsize=6.8)
-ax2.set_xticks(x); ax2.set_xticklabels(labels, fontsize=8); ax2.set_ylim(-0.2, 0.5)
+    ax2.text(x[i], hi[i] + (0.02 if i % 2 == 0 else 0.09), f'{k}/{n}\n' + (f'P={P:.3f}' if P >= 1e-3 else 'P<0.001'), ha='center', fontsize=6.5)
+ax2.set_xticks(x); ax2.set_xticklabels(labels, fontsize=7.5); ax2.set_ylim(-0.2, 0.55)
 ax2.set_xlabel('$(N, m)$'); ax2.set_ylabel(r'observed $-$ predicted $\beta$: median, 16–84%')
 ax2.set_title('(b) galaxies at or below their own prediction, and the sign test', fontsize=9.5)
 save(fig, 'fig5_per_galaxy')

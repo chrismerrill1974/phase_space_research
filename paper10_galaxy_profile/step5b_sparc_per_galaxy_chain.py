@@ -41,7 +41,7 @@ import os
 import numpy as np
 from scipy.optimize import brentq
 from scipy.special import i0, i1, k0, k1
-from scipy.stats import binom
+from scipy.stats import binom, wilcoxon
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
@@ -154,7 +154,9 @@ def stats(obs, pred):
     ok = np.isfinite(pred); d = obs[ok] - pred[ok]; n = ok.sum()
     k_below = int((d <= 0).sum())
     p_sign = binom.cdf(k_below, n, 0.5)          # one-sided: this few (or fewer) below if the model were right
-    return n, np.median(d), np.percentile(d, 16), np.percentile(d, 84), k_below, p_sign
+    mean = d.mean(); se = d.std(ddof=1) / np.sqrt(n)
+    p_wil = wilcoxon(d, alternative='greater').pvalue if n >= 6 else np.nan   # one-sided: offsets > 0
+    return n, np.median(d), np.percentile(d, 16), np.percentile(d, 84), k_below, p_sign, mean, se, p_wil
 
 # ── Report ───────────────────────────────────────────────────────────
 fid = results[(0.5, '8.178 kpc')]
@@ -163,15 +165,18 @@ print(f"  {'galaxy':11s} {'obs':>7s} | " + " ".join(f"({N:2d},{m})" for N, m in 
 for i, n in enumerate(fid['names']):
     print(f"  {n:11s} {fid['obs'][i]:+7.3f} | " + " ".join(f"{fid['pred'][c][i]:+7.3f}" if np.isfinite(fid['pred'][c][i]) else "    ---" for c in CASES))
 print(f"\n  population, observed median {np.median(fid['obs']):+.3f}:")
-print(f"  {'(N,m)':>7s} {'n':>3s} {'median obs-pred':>15s} {'16-84':>17s} {'k<=pred':>7s} {'P(sign)':>8s} {'pred median':>11s}")
+print(f"  {'(N,m)':>7s} {'n':>3s} {'median obs-pred':>15s} {'16-84':>17s} {'k<=pred':>7s} {'P(sign)':>8s} {'mean+/-SE':>14s} {'P(Wilcoxon)':>11s} {'pred median':>11s}")
 summary = {}
 for c in CASES:
-    n, md, p16, p84, k, p = stats(fid['obs'], fid['pred'][c])
-    summary[c] = (n, md, p16, p84, k, p)
-    print(f"  ({c[0]:2d},{c[1]}) {n:3d} {md:+15.3f} [{p16:+.3f}, {p84:+.3f}] {k:7d} {p:8.3f} {np.nanmedian(fid['pred'][c]):+11.3f}")
+    n, md, p16, p84, k, p, mean, se, pw = stats(fid['obs'], fid['pred'][c])
+    summary[c] = (n, md, p16, p84, k, p, mean, se, pw)
+    print(f"  ({c[0]:2d},{c[1]}) {n:3d} {md:+15.3f} [{p16:+.3f}, {p84:+.3f}] {k:7d} {p:8.3f} {mean:+7.3f}+/-{se:.3f} {pw:11.3f} {np.nanmedian(fid['pred'][c]):+11.3f}")
 print("  P(sign): one-sided binomial probability of seeing that few galaxies at or below their prediction if the model held;")
+print("  mean +/- SE: unweighted mean offset with its standard error; P(Wilcoxon): one-sided signed-rank test of offsets > 0;")
 print("  galaxies dropped from a case when their baryons alone exceed the datum: "
-      + "; ".join(f"({c[0]},{c[1]}): {len(fid['dropped'][c])}" for c in CASES if fid['dropped'][c]))
+      + "; ".join(f"({c[0]},{c[1]}): {', '.join(fid['dropped'][c])}" for c in CASES if fid['dropped'][c]))
+print("  galaxies in the step 5 sample without data at the anchor (not in the 20): "
+      + ", ".join(n for n in sample if n not in fid['names']))
 
 print("\nBrackets (median obs - pred; n):")
 print(f"  {'M/L, anchor':>20s} | " + " ".join(f"({N:2d},{m})" for N, m in CASES))
