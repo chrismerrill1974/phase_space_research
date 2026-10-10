@@ -169,6 +169,9 @@ for i, (N, f, rh) in enumerate(zip(N_GRID, F_GRID, RH_GRID)):
     for j, m200 in enumerate(M200_GRID):
         m_ext = lambda r, f=f, rh=rh: m_bar(r) + m_hern(r, f * M_BAR, rh)
         cells = []
+        if m_ext(r200_of(m200)) > 0.98 * m200:     # captured + baryons fill the well; no remainder to add
+            print(f"  {N:3d} {m200:8.1e} | captured component fills the well (>98 percent inside R_200); skipped")
+            continue
         for k, t in enumerate(T_GRID):
             g = solve_gas(m200, t, m_ext)
             if g is None:
@@ -224,7 +227,11 @@ for i, (N, f, rh0) in enumerate(zip(N_GRID, F_GRID, RH_GRID)):
             if not (np.isfinite(f_lo) and np.isfinite(f_hi)) or f_lo * f_hi > 0:
                 print(f"  {N:3d} {m200:8.1e} {t:4.1f} | no root for r_half in [{lo}, {hi}] kpc (resid {f_lo:+.0f}, {f_hi:+.0f})")
                 continue
-            rh = brentq(resid, lo, hi, xtol=1e-3, rtol=1e-6)
+            try:
+                rh = brentq(resid, lo, hi, xtol=1e-3, rtol=1e-6)
+            except ValueError:
+                print(f"  {N:3d} {m200:8.1e} {t:4.1f} | gas solution lost inside the r_half bracket; no root")
+                continue
             r, mg, mt = total_profile(f, rh, m200, t)
             vc = np.sqrt(G * mt / r)
             rh_p2[i, j, k] = rh
