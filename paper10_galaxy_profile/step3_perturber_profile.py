@@ -318,16 +318,17 @@ for i, N in enumerate(N_GRID):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# HEADLINE (Chris's decisions, 2026-10-10): scaling (ii) is the paper's
-# fiducial, with (i) as the fallback bracket; the promoted mapping
-# enters. Per-lens count computed directly per N with Paper VI's
+# HEADLINE (Chris, 2026-10-10, revised after peer review the same day):
+# BOTH extent scalings are carried as the headline bracket and neither is
+# chosen; the promoted mapping enters. Per-lens count computed directly per N with Paper VI's
 # integral: lower limit M_min(N; ii; 5 kpc), upper 1e12,
 # M_star(M) = 0.6 M/(1+f'), f' = (N-2) eps_inf(N).
 # ═══════════════════════════════════════════════════════════════════
-print("\nHEADLINE — scaling (ii) + promoted mapping, aperture 5 kpc; (i) + mapping as the fallback bracket")
-print(f"  {'N':>3s} {'f_prime':>7s} {'M_min(ii)':>9s} | N_det(ii+map)  C_sub,eff | N_det(i+map) | Paper VIII N_det | Paper XI n_exp(ii+map): flat linear area | null sigma")
+print("\nHEADLINE — promoted mapping, aperture 5 kpc; extent scalings (ii) held and (i) scaled, carried as a bracket")
+print(f"  {'N':>3s} {'f_prime':>7s} {'M_min(ii)':>9s} | N_det(ii+map)  C_sub,eff | N_det(i+map) | Paper VIII N_det | n_exp(ii+map): flat linear area | null | n_exp(i+map): flat linear area | null")
 N_det_head = np.full(nN, np.nan); N_det_fall = np.full(nN, np.nan); C_eff_head = np.full(nN, np.nan)
 n_exp_head = np.full((nN, len(ETA_MODELS)), np.nan)
+n_exp_fall = np.full((nN, len(ETA_MODELS)), np.nan)
 for i, N in enumerate(N_GRID):
     if not np.isfinite(RH_MW[i]):
         continue
@@ -337,8 +338,10 @@ for i, N in enumerate(N_GRID):
     N_det_fall[i] = n_detect_per_lens(N, EPS_INF[i], logM_lo=np.log10(M_min[i, 0, 1]), mstar_map=mm)
     C_eff_head[i] = N_det_head[i] / ((N - 1) * (1 - EPS_INF[i]))
     n_exp_head[i] = [N_det_head[i] * a_q1[m] for m in ETA_MODELS]
+    n_exp_fall[i] = [N_det_fall[i] * a_q1[m] for m in ETA_MODELS]
     print(f"  {N:3d} {fp:7.2f} {M_min[i,1,1]:9.2e} |    {N_det_head[i]:6.3f}       {C_eff_head[i]:6.3f}  |   {N_det_fall[i]:6.3f}     |      {N_det_pub[i]:.3f}       | "
-          + " ".join(f"{x:5.1f}" for x in n_exp_head[i]) + " | " + " ".join(f"{np.sqrt(2*x):.1f}" for x in n_exp_head[i]))
+          + " ".join(f"{x:5.1f}" for x in n_exp_head[i]) + " | " + " ".join(f"{np.sqrt(2*x):.1f}" for x in n_exp_head[i])
+          + " | " + " ".join(f"{x:5.1f}" for x in n_exp_fall[i]) + " | " + " ".join(f"{np.sqrt(2*x):.1f}" for x in n_exp_fall[i]))
 print(f"  Paper VIII n_exp(N=6) for reference: " + " ".join(f"{N_det_pub[iN6]*a_q1[m]:5.1f}" for m in ETA_MODELS))
 print("  Zero detections in the 312 systems would exclude N = 6 at the sigma shown; N = 2, 3 are excluded by step 2.")
 
@@ -349,5 +352,6 @@ np.savez(OUTPATH, N_GRID=N_GRID, EPS_INF=EPS_INF, APERTURES=APERTURES, SCALINGS=
          n_exp_isf=n_exp_isf, paper8_bracket=np.array(brk), C_sub_map=C_sub_map,
          g1_ratios=np.array([ratios[1.0], ratios[5.0], ratios[10.0]]), gates=np.array([g1, g2, g3]),
          N_det_head=N_det_head, N_det_fall=N_det_fall, C_eff_head=C_eff_head, n_exp_head=n_exp_head,
+         n_exp_fall=n_exp_fall,
          r_grid_p6=r_grid, k_isf_p6=k_isf, k_lcdm_p6=k_lcdm)
 print(f"\nSaved {OUTPATH}")

@@ -202,16 +202,16 @@ ax1.set_title('(a) the perturber profile', fontsize=9.5); ax1.legend(loc='lower 
 eta_models = [str(m) for m in h3['ETA_MODELS']]; a_q1 = h3['a_q1']
 pub6 = float(h3['N_det_pub'][iN6]) * a_q1
 head6 = h3['n_exp_head'][iN6]
-fall6 = float(h3['N_det_fall'][iN6]) * a_q1
+fall6 = h3['n_exp_fall'][iN6]
 xpos = np.arange(3); w = 0.26
 b1 = ax2.bar(xpos - w, pub6, w, color='#bbbbbb', label='Paper VIII (intact NFW)')
-b2 = ax2.bar(xpos, head6, w, color=COL[6], label='Paper X headline (scaling ii + mapping)')
-b3 = ax2.bar(xpos + w, fall6, w, color='#e8a79a', label='Paper X fallback (scaling i + mapping)')
+b2 = ax2.bar(xpos, head6, w, color=COL[6], label='Paper X, extent held (ii) + mapping')
+b3 = ax2.bar(xpos + w, fall6, w, color='#e8a79a', label='Paper X, extent scaled (i) + mapping')
 for bars in (b1, b2, b3):
     for b in bars:
         ax2.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.3, f'{b.get_height():.1f}', ha='center', fontsize=7.5)
 ax2.set_xticks(xpos); ax2.set_xticklabels([f'$\\eta$ {m}' for m in eta_models])
-ax2.set_ylabel('expected detections, $N=6$, 312 Q1 systems'); ax2.set_ylim(0, 28)
+ax2.set_ylabel('expected detections, $N=6$, 312 Q1 systems'); ax2.set_ylim(0, 30)
 ax2.set_title('(b) the Paper XI in-principle test', fontsize=9.5); ax2.legend(loc='upper right', fontsize=7.5)
 save(fig, 'fig4_perturber_and_paperxi')
 print("done")
