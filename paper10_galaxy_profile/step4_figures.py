@@ -201,7 +201,9 @@ save(fig, 'fig3_curves_and_slope')
 # ── Figure 5: the chain per SPARC galaxy (step 5b) ───────────────────
 h5b = np.load(os.path.join(DATA, 'sparc_per_galaxy_chain.npz'), allow_pickle=True)
 cases = [tuple(c) for c in h5b['cases']]; obs = h5b['fid_obs']; pred = h5b['fid_pred']; summ = h5b['summary']
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.2, 3.8))
+# panel (b) carries 14 cells since the fourth review added (3,2), (4,2), (3,3), (4,3):
+# it is given more width, a three-level label stagger and rotated tick labels
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.8, 3.9), gridspec_kw={'width_ratios': [1.0, 1.35]})
 for c, mk, col, lab in (((10, 1), 'x', '#882255', '$(N,m)=(10,1)$'), ((10, 2), '^', '#2255aa', '$(N,m)=(10,2)$')):
     k = cases.index(c); ok = np.isfinite(pred[k])
     ax1.plot(pred[k][ok], obs[ok], mk, color=col, ms=7, mew=1.4, ls='none', label=lab)
@@ -215,8 +217,9 @@ ax2.errorbar(x, med, yerr=[med - lo, hi - med], fmt='o', color='k', ms=5, capsiz
 ax2.axhline(0, color=GREY, lw=0.8, ls=':')
 for i, c in enumerate(cases):
     k = int(summ[i, 4]); n = int(summ[i, 0]); P = summ[i, 5]
-    ax2.text(x[i], hi[i] + (0.02 if i % 2 == 0 else 0.09), f'{k}/{n}\n' + (f'P={P:.3f}' if P >= 1e-3 else 'P<0.001'), ha='center', fontsize=6.5)
-ax2.set_xticks(x); ax2.set_xticklabels(labels, fontsize=7.5); ax2.set_ylim(-0.2, 0.55)
+    # labels in two fixed rows above every 16-84 bar (the tallest tops at 0.46), alternating so neighbours never touch
+    ax2.text(x[i], (0.52, 0.605)[i % 2], f'{k}/{n}\n' + (f'P={P:.3f}' if P >= 1e-3 else 'P<0.001'), ha='center', va='bottom', fontsize=6.3)
+ax2.set_xticks(x); ax2.set_xticklabels(labels, fontsize=7, rotation=45, ha='right', rotation_mode='anchor'); ax2.set_ylim(-0.2, 0.70)
 ax2.set_xlabel('$(N, m)$'); ax2.set_ylabel(r'observed $-$ predicted $\beta$: median, 16–84%')
 ax2.set_title('(b) galaxies at or below their own prediction, and the sign test', fontsize=9.5)
 save(fig, 'fig5_per_galaxy')
