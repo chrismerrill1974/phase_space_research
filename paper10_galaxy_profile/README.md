@@ -31,7 +31,14 @@ threshold for the Euclid Q1 perturber search (Paper XI).
   with the promoted mass-to-number mapping.
   Inputs: `paper6_phase2_results.json`, `euclid_forecast_paper7.npz`,
   `q1_demographics_paper8.npz`. Output: `perturber_profile.npz`.
-- `step4_figures.py` — Produces the four paper figures.
+- `step5_sparc_mw_mass_slopes.py` — Measures the predicted quantity in
+  SPARC: the least-squares slope of ln V on ln R over 15-30 kpc for
+  spirals with V_flat 180-260 km/s, Q <= 2, inclination >= 30 deg and
+  at least three points spanning 8 kpc (21 galaxies), plus a scaled
+  6-13 disc-scale-length selection. Inputs: the two SPARC tables in
+  `data/sparc/` (in this repo). Output: `sparc_mw_mass_slopes.npz`.
+- `step4_figures.py` — Produces the four paper figures (Fig 3b reads
+  the step 5 output for the SPARC band).
 
 ## Expected directory layout
 
@@ -42,9 +49,11 @@ Scripts use relative paths from a project root containing:
 02_figures/    # step4_figures.py
 data/          # inputs listed above and the .npz outputs
                # (in this repo: data/paper10/)
+data/sparc/    # SPARC_Lelli2016c.mrt, MassModels_Lelli2016c.mrt (in this repo)
 figures/       # figure outputs
 ```
 
-The only external input is the Milky Way baryonic model, whose
-parameters are written into the scripts. Steps 1, 2, 3 and 4 run in
-seconds; step 2b takes minutes. All single-threaded.
+External inputs are the Milky Way baryonic model, whose parameters are
+written into the scripts, and the SPARC tables already in this repo.
+Steps 1, 2, 3, 4 and 5 run in seconds; step 2b takes minutes. All
+single-threaded.

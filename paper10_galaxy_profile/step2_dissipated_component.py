@@ -240,10 +240,35 @@ for i, N in enumerate(N_GRID):
     vc_far_pred[i] = np.interp(R_FAR, R_PROF_FAR, v)
     print(f"  {N:3d} {f:5.2f} | {rh_pred[i]:7.1f} | {beta_pred[i]:+.3f} | {vc30_pred[i]:7.0f} |"
           + " ".join(f"{x:7.0f}" for x in vc_far_pred[i]))
-print("  Reference: NFW c=12 with the same baryons gives beta = -0.05 (1e12) to -0.14 (5e11); a flat curve is 0;")
+print("  Reference: NFW c=12 with the same baryons gives beta = -0.07 (1e12) to -0.17 (5e11), from step 1; a flat curve is 0;")
 print("  Keplerian is -0.5. Gaia-era Milky Way linear slopes of -1.7 to -2.2 km/s/kpc at R~20 kpc, v~215 km/s")
 print("  correspond to beta ~ -0.16 to -0.20; Jiao et al. 2026 power law beta = -0.50 +/- 0.10 beyond 16 kpc.")
 print("  These are data to be tested against the column above, not inputs to it.")
+
+
+# ── The same chain at m = 2 and m = 3 (added after peer review, 2026-10-10):
+# if other branches hold more collapsed mass per well than ours, f grows,
+# the extent that reproduces the solar-radius datum grows, and beta
+# flattens. Printed so the population comparison (step 5) can be read
+# against m, with nothing else changed.
+print("\nThe chain at m = 2 and m = 3 (captured + baryons only):")
+print(f"  {'N':>3s} | {'m=2: f':>6s} {'r_half':>7s} {'beta':>7s} {'M<50':>5s} {'M<100':>5s} | {'m=3: f':>6s} {'r_half':>7s} {'beta':>7s} {'M<50':>5s} {'M<100':>5s}   [masses 1e11; streams: 3.77, 5.6]")
+rh_pred_m = np.full((2, nN), np.nan); beta_pred_m = np.full((2, nN), np.nan)
+m50_m = np.full((2, nN), np.nan); m100_m = np.full((2, nN), np.nan)
+for i, N in enumerate(N_GRID):
+    cells = []
+    for k, mm_ in enumerate((2.0, 3.0)):
+        f = f_avail[i] * mm_
+        if f <= f_req_A or f <= 0:
+            cells.append(f"{f:6.2f} {'---':>7s} {'---':>7s} {'---':>5s} {'---':>5s}"); continue
+        rh = brentq(lambda r_: f_req_of_rhalf(r_) - f, 1e-3, 1e5)
+        m_tot = m_bar(R_PROF_FAR) + m_hernquist(R_PROF_FAR, f * M_BAR, rh)
+        v = np.sqrt(G * m_tot / R_PROF_FAR)
+        rh_pred_m[k, i] = rh; beta_pred_m[k, i] = outer_slope(R_PROF_FAR, v)
+        m50 = np.interp(50.0, R_PROF_FAR, m_tot); m100 = np.interp(100.0, R_PROF_FAR, m_tot)
+        m50_m[k, i] = m50; m100_m[k, i] = m100
+        cells.append(f"{f:6.2f} {rh:7.1f} {beta_pred_m[k,i]:+7.3f} {m50/1e11:5.2f} {m100/1e11:5.2f}")
+    print(f"  {N:3d} | " + " | ".join(cells))
 
 print("\nOff-plane test context (geometry A, m = 1): implied dark-disc mass = (N-1) eps M_stellar_disc")
 for i, N in enumerate(N_GRID):
@@ -260,5 +285,6 @@ np.savez(OUTPATH, N_GRID=N_GRID, EPS_INF=EPS_INF, M_SCALE=M_SCALE, R_HALF=R_HALF
          f_req_A=f_req_A, beta_req_A=beta_req_A, f_req_B=f_req_B,
          beta_req_B=beta_req_B, vc30_req_B=vc30_req_B, f_avail_m1=f_avail,
          rh_pred=rh_pred, beta_pred=beta_pred, vc30_pred=vc30_pred,
-         R_FAR=R_FAR, vc_far_pred=vc_far_pred)
+         R_FAR=R_FAR, vc_far_pred=vc_far_pred,
+         rh_pred_m23=rh_pred_m, beta_pred_m23=beta_pred_m, m50_m23=m50_m, m100_m23=m100_m)
 print(f"\nSaved {OUTPATH}")

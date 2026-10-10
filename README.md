@@ -47,7 +47,7 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 
 ### Paper X: The Galaxy-Scale Dark Mass Profile Under Independent Structure Formation -- A Dated Prediction for the Milky Way's Outer Rotation Curve, and a Corrected Threshold for the Euclid Perturber Search
 - **Zenodo:** (pending)
-- **Summary:** Theory paper deriving the dark mass profile around a single galaxy from the Paper IX capture ontology, motivated by the Gaia DR3 debate over a declining Milky Way rotation curve. Shows that other-branch diffuse gas cannot be the halo (an isothermal atmosphere holds the halo mass only above the virial temperature, where it is too diffuse: 177-179 km/s at the solar radius against 230 measured), so captured other-branch collapsed matter carries it. With M_cap = (N-1) eps_inf(N) M_bar from the series' own numbers, N = 2 is excluded by the inner rotation curve, N = 6 reaches the solar-radius speed with a 20 kpc extent and nothing tuned, and the outer slope follows from N alone: beta(15-30 kpc) = -0.42, -0.30, -0.22, -0.17 for N = 4, 6, 8, 10, with a dip near 100 kpc that external galaxies test. Replacing Paper VI's intact-NFW perturber changes the Euclid Q1 in-principle expectation at N = 6 from 12.6-16.8 to 8.8-11.8 detections (4.2-4.9 sigma null test). Predictions dated before Euclid DR1 and Gaia DR4 (2 December 2026).
+- **Summary:** Theory paper deriving the dark mass profile around a single galaxy from the Paper IX capture ontology, motivated by the Gaia DR3 debate over a declining Milky Way rotation curve. Shows that other-branch diffuse gas cannot be the halo (an isothermal atmosphere holds the halo mass only above the virial temperature, where it is too diffuse: 177-179 km/s at the solar radius against 230 measured), so captured other-branch collapsed matter carries it. With M_cap = (N-1) eps_inf(N) M_bar from the series' own numbers, N = 2 is excluded by the inner rotation curve, N = 6 reaches the solar-radius speed with a 20 kpc extent and nothing tuned, and the outer slope follows from N alone: beta(15-30 kpc) = -0.42, -0.30, -0.22, -0.17 for N = 4, 6, 8, 10, with a dip near 100 kpc that external galaxies test. That prediction is already excluded by the external population: of 21 SPARC spirals with Milky-Way rotation speeds, none has a slope at or below -0.17 (median -0.01), a published null for the registered model; the family with other branches holding two to three times our collapsed mass per well survives, reaching the SPARC band at N = 10 and both Milky Way stream masses within 7 percent, and predicts a mild Milky Way decline (-0.10) for Gaia DR4 (2 December 2026). Replacing Paper VI's intact-NFW perturber changes the Euclid Q1 in-principle expectation at N = 6 from 12.6-16.8 to 8.8-19.6 detections (4.2-6.3 sigma null test), bracketed over the perturber's extent.
 
 ---
 
@@ -78,6 +78,7 @@ phase_space_research/
 |       |-- dissipated_component.npz   # Step 2: captured-component budget and chain
 |       |-- combined_halo.npz          # Step 2b: captured + hot remainder to R_200
 |       |-- perturber_profile.npz      # Step 3: perturber threshold, Paper XI numbers
+|       |-- sparc_mw_mass_slopes.npz   # Step 5: SPARC Milky-Way-mass outer slopes
 |       |-- joint_constraint_paper7.npz, euclid_forecast_paper7.npz,
 |       |   q1_demographics_paper8.npz, paper6_phase2_results.json  # inputs (series products)
 |
@@ -168,6 +169,7 @@ phase_space_research/
 |   |-- step2_dissipated_component.py    # Captured component: budget, N -> slope
 |   |-- step2b_combine_hot_remainder.py  # Hot remainder added, curve to R_200
 |   |-- step3_perturber_profile.py       # Perturber profile, Paper XI threshold
+|   |-- step5_sparc_mw_mass_slopes.py    # SPARC outer slopes, Milky-Way-mass spirals
 |   |-- step4_figures.py                 # Paper figures
 ```
 
@@ -200,5 +202,5 @@ Compiled from Amon+2023, Leauthaud+2017, Efstathiou+2022, and major weak lensing
 
 This project is released under the MIT License. See [LICENSE.md](LICENSE.md) for details.
 
-### Milky Way baryonic model and stream masses (Paper X)
-Paper X uses the B2 Milky Way baryonic model of de Salas et al. (2019, JCAP 10, 037) as adopted by Jiao et al. (2026, arXiv:2609.30364), with parameters written into the scripts; no data files are needed. The solar-radius circular speed, the Orphan-Chenab (Koposov et al. 2023) and Sagittarius (Vasiliev et al. 2021) stream masses, and the Gaia-era outer slopes are literature values recorded in the paper as data to be tested.
+### Milky Way baryonic model, stream masses, and SPARC (Paper X)
+Paper X's step 5 reads the SPARC tables in `data/sparc/` (Papers II-III). Paper X uses the B2 Milky Way baryonic model of de Salas et al. (2019, JCAP 10, 037) as adopted by Jiao et al. (2026, arXiv:2609.30364), with parameters written into the scripts; no data files are needed. The solar-radius circular speed, the Orphan-Chenab (Koposov et al. 2023) and Sagittarius (Vasiliev et al. 2021) stream masses, and the Gaia-era outer slopes are literature values recorded in the paper as data to be tested.

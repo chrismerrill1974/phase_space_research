@@ -146,25 +146,29 @@ def solve_halo(m200, t_ratio, r_min=0.01, r_max_factor=5.0):
     assert f_lo < 0, "low-density end of the shooting bracket"
     # The enclosed mass is bounded above; scan upward for a sign change
     # so that a cold, infeasible case is reported rather than asserted.
+    # Scan the whole range and collect EVERY sign change: the cored sphere's
+    # enclosed mass oscillates about the singular value, so more than one
+    # central density can satisfy the normalisation (peer review, finding 9).
     grid = np.linspace(lo, hi, 49)
-    f_prev, x_prev = f_lo, lo
-    bracket = None
-    for x in grid[1:]:
-        f = mass_in_r200(x)
-        if f > 0:
-            bracket = (x_prev, x)
-            break
-        f_prev, x_prev = f, x
-    if bracket is None:
+    fvals = [f_lo] + [mass_in_r200(x) for x in grid[1:]]
+    brackets = [(grid[k], grid[k + 1]) for k in range(len(grid) - 1)
+                if fvals[k] * fvals[k + 1] < 0]
+    if not brackets:
         return None
-    log10_rho0 = brentq(mass_in_r200, *bracket, xtol=1e-10, rtol=1e-12)
+    roots = [brentq(mass_in_r200, *b, xtol=1e-10, rtol=1e-12) for b in brackets]
+    vc8_roots = []
+    for lr in roots:
+        r_, rho_, mg_ = integrate_gas(sigma2, np.log(10.0**lr), r_min, r_max)
+        vc8_roots.append(float(np.sqrt(G * (np.interp(8.178, r_, mg_) + m_bar(8.178)) / 8.178)))
+    log10_rho0 = roots[0]          # fiducial profile: the least dense root, as before
     r, rho, mg = integrate_gas(sigma2, np.log(10.0**log10_rho0),
                                r_min, r_max)
     m_tot = mg + m_bar(r)
     vc = np.sqrt(G * m_tot / r)
     return dict(r=r, rho_gas=rho, m_gas=mg, m_tot=m_tot, vc=vc,
                 r200=r200, sigma2=sigma2, sigma2_vir=sigma2_vir,
-                rho0=10.0**log10_rho0)
+                rho0=10.0**log10_rho0, n_roots=len(roots),
+                vc8_roots=np.array(vc8_roots))
 
 def outer_slope(r, vc, r_lo=15.0, r_hi=30.0):
     """beta = d ln v_c / d ln R by least squares over [r_lo, r_hi]."""
@@ -223,6 +227,9 @@ vc_at = np.full((len(M200_GRID), len(T_GRID), len(R_EVAL)), np.nan)
 vc_gas_at = np.full_like(vc_at, np.nan)      # gas-only circular speed
 r_half = np.full((len(M200_GRID), len(T_GRID)), np.nan)   # gas half-mass radius inside R_200
 f_gas30 = np.full((len(M200_GRID), len(T_GRID)), np.nan)  # M_gas(<30 kpc) / M_200
+n_roots = np.zeros((len(M200_GRID), len(T_GRID)), dtype=int)
+vc8_root_lo = np.full((len(M200_GRID), len(T_GRID)), np.nan)
+vc8_root_hi = np.full((len(M200_GRID), len(T_GRID)), np.nan)
 rho0 = np.full((len(M200_GRID), len(T_GRID)), np.nan)
 r200_arr = np.array([r200_of(m) for m in M200_GRID])
 beta_nfw = np.zeros(len(M200_GRID))
@@ -240,6 +247,8 @@ for i, m200 in enumerate(M200_GRID):
         if h is None:          # no hydrostatic solution at this T (cold bound)
             continue
         beta[i, j] = outer_slope(h['r'], h['vc'])
+        n_roots[i, j] = h['n_roots']
+        vc8_root_lo[i, j] = h['vc8_roots'].min(); vc8_root_hi[i, j] = h['vc8_roots'].max()
         vc_at[i, j] = np.interp(R_EVAL, h['r'], h['vc'])
         vc_gas_at[i, j] = np.interp(R_EVAL, h['r'], np.sqrt(G * h['m_gas'] / h['r']))
         rho0[i, j] = h['rho0']
@@ -288,6 +297,16 @@ for i, m200 in enumerate(M200_GRID):
     print(f"  {m200:8.1e} {T_GRID[j]:6.1f} | {row} | {beta[i, j]:+.3f} |"
           f" {vc_gas_at[i,j,0]:8.1f} {vc_gas_at[i,j,4]:7.1f} {r_half[i,j]:6.0f} {f_gas30[i,j]:7.3f}")
 
+print("\nMultiple hydrostatic roots (peer review, finding 9): cells with more than one root,")
+print("  and the span of v_c(8.2) over ALL roots on the feasible grid")
+multi = [(M200_GRID[i], T_GRID[j], n_roots[i, j], vc8_root_lo[i, j], vc8_root_hi[i, j])
+         for i in range(len(M200_GRID)) for j in range(len(T_GRID)) if n_roots[i, j] > 1]
+for m, t, n, lo_, hi_ in multi:
+    print(f"  M_200 = {m:.1e}, T/T_vir = {t:.1f}: {n} roots, v_c(8.2) = {lo_:.1f}-{hi_:.1f} km/s")
+ok = np.isfinite(vc8_root_lo)
+print(f"  v_c(8.2) over all roots and all feasible cells: {np.nanmin(vc8_root_lo):.1f}-{np.nanmax(vc8_root_hi):.1f} km/s"
+      f"  (least-dense roots alone: {np.nanmin(vc_at[:, :, 0]):.1f}-{np.nanmax(vc_at[:, :, 0]):.1f})")
+
 print("\nISF consistency bound  M_200 >= N * M_bar  ->  N_max(M_200):")
 n_max = np.floor(M200_GRID / M_BAR).astype(int)
 for m200, nm in zip(M200_GRID, n_max):
@@ -313,5 +332,6 @@ np.savez(OUTPATH,
          M_BAR=M_BAR, RHO_CRIT=RHO_CRIT, n_max=n_max,
          gate_sis_rho=gate_sis_rho, gate_sis_vc=gate_sis_vc,
          gate_core=gate_core, level0_pass=LEVEL0_PASS,
-         t_min_feasible=t_min_feasible)
+         t_min_feasible=t_min_feasible, n_roots=n_roots,
+         vc8_root_lo=vc8_root_lo, vc8_root_hi=vc8_root_hi)
 print(f"\nSaved {OUTPATH}")

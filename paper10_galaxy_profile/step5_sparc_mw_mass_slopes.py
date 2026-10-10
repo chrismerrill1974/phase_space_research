@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+"""
+Paper X — Step 5: the outer slopes of Milky-Way-mass spirals in SPARC
+
+Peer review (2026-10-10, finding 3) asked that the present-day tension
+between the predicted declining outer curves and external spirals be
+quantified rather than deferred. This script measures, for the SPARC
+galaxies that resemble the Milky Way in rotation speed, the same
+quantity the paper predicts: beta = d ln v_c / d ln R over 15-30 kpc,
+by least squares on the observed rotation curve points in that range.
+
+Selection (stated before looking): quality flag Q <= 2, inclination
+>= 30 deg, asymptotically flat speed V_flat in [180, 260] km/s (the
+Milky Way's ~230), and at least three observed points in 15-30 kpc
+spanning at least 8 kpc. A second, scaled selection uses the same
+galaxies with points in 6-13 disc scale lengths (the Milky Way's 15-30
+kpc at R_d = 2.35 kpc), to guard against the physical-radius choice.
+
+Reported: per-galaxy beta with its formal error, the sample median and
+16-84 percentile range, and the fraction of galaxies with beta below
+each predicted value. The Paper X predictions (-0.42, -0.30, -0.22,
+-0.17 at N = 4, 6, 8, 10) and the NFW reference are printed beside the
+data for comparison; nothing is fitted.
+
+Inputs:  ../data/sparc/SPARC_Lelli2016c.mrt (Table 1: galaxy properties)
+         ../data/sparc/MassModels_Lelli2016c.mrt (rotation curves)
+         (Lelli, McGaugh & Schombert 2016; copied from the series' data)
+Output:  ../data/sparc_mw_mass_slopes.npz
+Runtime: under a second.
+"""
+
+import os
+import numpy as np
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
+DATA = os.path.join(ROOT, 'data')
+OUTPATH = os.path.join(DATA, 'sparc_mw_mass_slopes.npz')
+
+def tokens(path, n_min):
+    """Whitespace-split rows of a CDS table with at least n_min fields whose
+    second field is numeric (the data lines; names are right-justified in
+    Table 1, so byte positions cannot be trusted)."""
+    out = []
+    for l in open(path, encoding='utf-8', errors='replace'):
+        t = l.split()
+        if len(t) >= n_min:
+            try:
+                float(t[1]); float(t[2])
+            except ValueError:
+                continue
+            out.append(t)
+    return out
+
+# ── Table 1: galaxy properties (columns in header order) ───────────
+gal = {}
+for t in tokens(os.path.join(DATA, 'sparc', 'SPARC_Lelli2016c.mrt'), 18):
+    gal[t[0]] = dict(T=int(t[1]), D=float(t[2]), inc=float(t[5]), Rdisk=float(t[11]),
+                     Vflat=float(t[15]), e_Vflat=float(t[16]), Q=int(t[17]))
+
+# ── Mass models: rotation curves ────────────────────────────────────
+rc = {}
+for t in tokens(os.path.join(DATA, 'sparc', 'MassModels_Lelli2016c.mrt'), 10):
+    rc.setdefault(t[0], []).append((float(t[2]), float(t[3]), float(t[4])))
+for k in rc:
+    rc[k] = np.array(rc[k])
+
+print(f"SPARC: {len(gal)} galaxies in Table 1, {len(rc)} with rotation curves")
+
+def slope(R, V, eV):
+    """Weighted least-squares slope of ln V on ln R with its formal error."""
+    x, y, w = np.log(R), np.log(V), (V / eV)**2
+    W = w.sum(); xm = (w * x).sum() / W; ym = (w * y).sum() / W
+    sxx = (w * (x - xm)**2).sum()
+    b = (w * (x - xm) * (y - ym)).sum() / sxx
+    return b, np.sqrt(1.0 / sxx)
+
+VFLAT_LO, VFLAT_HI, Q_MAX, INC_MIN = 180.0, 260.0, 2, 30.0
+R_LO, R_HI, N_MIN, SPAN_MIN = 15.0, 30.0, 3, 8.0
+RD_LO, RD_HI = 6.0, 13.0
+PRED = {4: -0.42, 6: -0.30, 8: -0.22, 10: -0.17}
+NFW_REF = -0.074
+
+base = [n for n, g in gal.items() if g['Q'] <= Q_MAX and g['inc'] >= INC_MIN
+        and VFLAT_LO <= g['Vflat'] <= VFLAT_HI and g['Vflat'] > 0 and n in rc]
+print(f"Milky-Way-mass candidates (Q<={Q_MAX}, inc>={INC_MIN:.0f}, V_flat in [{VFLAT_LO:.0f},{VFLAT_HI:.0f}]): {len(base)}")
+
+rows_phys, rows_scaled = [], []
+for n in base:
+    R, V, eV = rc[n].T
+    sel = (R >= R_LO) & (R <= R_HI)
+    if sel.sum() >= N_MIN and (R[sel].max() - R[sel].min()) >= SPAN_MIN:
+        b, eb = slope(R[sel], V[sel], eV[sel])
+        rows_phys.append((n, gal[n]['Vflat'], R.max(), int(sel.sum()), b, eb))
+    rd = gal[n]['Rdisk']
+    sel2 = (R >= RD_LO * rd) & (R <= RD_HI * rd)
+    if rd > 0 and sel2.sum() >= N_MIN and (R[sel2].max() - R[sel2].min()) >= 0.5 * (RD_HI - RD_LO) * rd:
+        b2, eb2 = slope(R[sel2], V[sel2], eV[sel2])
+        rows_scaled.append((n, gal[n]['Vflat'], rd, int(sel2.sum()), b2, eb2))
+
+def report(rows, title, col):
+    print(f"\n{title}: {len(rows)} galaxies")
+    print(f"  {'galaxy':11s} {'V_flat':>6s} {col:>7s} {'n_pts':>5s} {'beta':>7s} {'err':>6s}")
+    for n, vf, c, k, b, eb in sorted(rows, key=lambda r: r[4]):
+        print(f"  {n:11s} {vf:6.1f} {c:7.1f} {k:5d} {b:+7.3f} {eb:6.3f}")
+    b = np.array([r[4] for r in rows]); eb = np.array([r[5] for r in rows])
+    if len(b) == 0:
+        return b, eb
+    p16, p50, p84 = np.percentile(b, [16, 50, 84])
+    w = 1.0 / eb**2; mean_w = (w * b).sum() / w.sum(); err_w = np.sqrt(1.0 / w.sum())
+    print(f"  median {p50:+.3f}, 16-84 percent range [{p16:+.3f}, {p84:+.3f}], "
+          f"inverse-variance mean {mean_w:+.3f} +/- {err_w:.3f}, scatter (std) {b.std(ddof=1) if len(b) > 1 else float('nan'):.3f}")
+    print("  fraction of galaxies with beta below the Paper X prediction: "
+          + ", ".join(f"N={N}: {(b < v).mean():.2f}" for N, v in PRED.items())
+          + f";  below NFW reference {NFW_REF:+.3f}: {(b < NFW_REF).mean():.2f}")
+    return b, eb
+
+b_phys, eb_phys = report(rows_phys, f"Physical radii {R_LO:.0f}-{R_HI:.0f} kpc", 'R_max')
+b_scaled, eb_scaled = report(rows_scaled, f"Scaled radii {RD_LO:.0f}-{RD_HI:.0f} R_disk", 'R_disk')
+print("\nPaper X predictions for Milky-Way-mass spirals, beta(15-30 kpc): "
+      + ", ".join(f"N={N}: {v:+.2f}" for N, v in PRED.items()) + f"; NFW c=12 at 1e12: {NFW_REF:+.3f}")
+
+np.savez(OUTPATH,
+         names_phys=np.array([r[0] for r in rows_phys]), vflat_phys=np.array([r[1] for r in rows_phys]),
+         rmax_phys=np.array([r[2] for r in rows_phys]), npts_phys=np.array([r[3] for r in rows_phys]),
+         beta_phys=b_phys, err_phys=eb_phys,
+         names_scaled=np.array([r[0] for r in rows_scaled]), vflat_scaled=np.array([r[1] for r in rows_scaled]),
+         rdisk_scaled=np.array([r[2] for r in rows_scaled]), npts_scaled=np.array([r[3] for r in rows_scaled]),
+         beta_scaled=b_scaled, err_scaled=eb_scaled,
+         selection=np.array([VFLAT_LO, VFLAT_HI, Q_MAX, INC_MIN, R_LO, R_HI, N_MIN, SPAN_MIN, RD_LO, RD_HI]),
+         pred_N=np.array(list(PRED.keys())), pred_beta=np.array(list(PRED.values())), nfw_ref=NFW_REF)
+print(f"\nSaved {OUTPATH}")

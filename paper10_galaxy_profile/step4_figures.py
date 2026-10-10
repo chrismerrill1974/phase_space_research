@@ -163,19 +163,34 @@ beta_2 = h2['beta_pred'][[int(np.where(h2['N_GRID'] == N)[0][0]) for N in Nb]]
 ax2.axhspan(-0.20, -0.16, color=GREY, alpha=0.18, lw=0)
 ax2.text(4.6, -0.18, 'Gaia-era MW linear slopes', fontsize=7.5, va='center', color='#444444')
 ax2.axhspan(-0.60, -0.40, color='#f0c8bf', alpha=0.45, lw=0)
-ax2.text(6.4, -0.50, 'Jiao+2026 power law', fontsize=7.5, va='center', color='#884433')
-ax2.axhline(0.0, color='k', lw=0.8, ls=':'); ax2.text(3.2, 0.01, 'flat', fontsize=7.5)
-ax2.axhline(-0.05, color='k', lw=0.8, ls='-.'); ax2.text(3.2, -0.08, r'NFW $c{=}12$, $10^{12}$', fontsize=7.5)
+ax2.text(4.05, -0.45, 'Jiao+2026 power law', fontsize=7.5, va='center', color='#884433')
+ax2.axhline(0.0, color='k', lw=0.8, ls=':'); ax2.text(3.2, 0.012, 'flat', fontsize=7.5)
+beta_nfw_1e12 = float(h1['beta_nfw'][int(np.argmin(np.abs(h1['M200_GRID'] - 1e12)))])   # from step 1, not typed in
+ax2.axhline(beta_nfw_1e12, color='k', lw=0.8, ls='-.'); ax2.text(3.2, beta_nfw_1e12 - 0.03, r'NFW $c{=}12$, $10^{12}$', fontsize=7.5)
+# SPARC Milky-Way-mass spirals (step 5): median and 16-84 percent band, present-day data
+h5 = np.load(os.path.join(DATA, 'sparc_mw_mass_slopes.npz'), allow_pickle=True)
+p16, p50, p84 = np.percentile(h5['beta_phys'], [16, 50, 84])
+ax2.axhspan(p16, p84, color='#cfe3d8', alpha=0.6, lw=0, zorder=0)
+ax2.axhline(p50, color='#2a6f4e', lw=1.0, ls='-')
+ax2.text(4.1, p84 + 0.012, f'SPARC, $V_f$=180–260 km/s, 15–30 kpc: {len(h5["beta_phys"])} galaxies, 16–84%% band, median {p50:+.2f}' % (), fontsize=7.2, color='#2a6f4e')
+
 for i, N in enumerate(Nb):
     ax2.errorbar([N], [0.5 * (beta_lo[i] + beta_hi[i])], yerr=[[0.5 * (beta_hi[i] - beta_lo[i])]] * 2,
                  fmt='o', color=COL[int(N)], ms=7, capsize=3, lw=1.6)
     ax2.plot([N], [beta_2[i]], 'x', color=COL[int(N)], ms=7, mew=1.4)
-ax2.plot([], [], 'o', color='k', label='prediction, with hot remainder (range over $M_{200}$, $T$)')
-ax2.plot([], [], 'x', color='k', label='captured + baryons only')
-ax2.set_xlim(3, 12.2); ax2.set_ylim(-0.62, 0.06); ax2.set_xticks([4, 6, 8, 10])
+bm = h2['beta_pred_m23']   # rows: m = 2, 3; columns follow h2['N_GRID']
+for i, N in enumerate(Nb):
+    j = int(np.where(h2['N_GRID'] == N)[0][0])
+    ax2.plot([N + 0.25], [bm[0, j]], marker='^', mfc='white', mec=COL[int(N)], ms=7, ls='none', mew=1.4)
+    ax2.plot([N + 0.45], [bm[1, j]], marker='s', mfc='white', mec=COL[int(N)], ms=6, ls='none', mew=1.4)
+ax2.plot([], [], marker='^', mfc='white', mec='k', ms=7, ls='none', label='captured + baryons, $m=2$')
+ax2.plot([], [], marker='s', mfc='white', mec='k', ms=6, ls='none', label='captured + baryons, $m=3$')
+ax2.plot([], [], 'o', color='k', label='prediction, with hot remainder, $m=1$ (range over $M_{200}$, $T$)')
+ax2.plot([], [], 'x', color='k', label='captured + baryons only, $m=1$')
+ax2.set_xlim(3, 12.2); ax2.set_ylim(-0.62, 0.10); ax2.set_xticks([4, 6, 8, 10])
 ax2.set_xlabel('number of branches $N$'); ax2.set_ylabel(r'$\beta = d\ln v_c/d\ln R$ at 15–30 kpc')
 ax2.set_title('(b) the outer slope follows from $N$', fontsize=9.5)
-ax2.legend(loc='lower right', fontsize=7.5)
+ax2.legend(loc='lower right', fontsize=6.8)
 save(fig, 'fig3_curves_and_slope')
 
 # ── Figure 4: perturber convergence and the Paper XI numbers ───────
