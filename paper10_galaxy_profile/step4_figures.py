@@ -179,11 +179,14 @@ for i, N in enumerate(Nb):
                  fmt='o', color=COL[int(N)], ms=7, capsize=3, lw=1.6)
     ax2.plot([N], [beta_2[i]], 'x', color=COL[int(N)], ms=7, mew=1.4)
 bm = h2['beta_pred_m23']   # rows: m = 2, 3; columns follow h2['N_GRID']
+hm2 = np.load(os.path.join(DATA, 'combined_halo_m2.npz'), allow_pickle=True)   # step 2b at m = 2
 for i, N in enumerate(Nb):
     j = int(np.where(h2['N_GRID'] == N)[0][0])
-    ax2.plot([N + 0.25], [bm[0, j]], marker='^', mfc='white', mec=COL[int(N)], ms=7, ls='none', mew=1.4)
+    k = int(np.where(hm2['N_GRID'] == N)[0][0])
+    b2 = hm2['beta_p2'][k]; lo2, hi2 = np.nanmin(b2), np.nanmax(b2)
+    ax2.errorbar([N + 0.25], [0.5 * (lo2 + hi2)], yerr=[[0.5 * (hi2 - lo2)]] * 2, fmt='^', color=COL[int(N)], ms=7, capsize=3, lw=1.4)
     ax2.plot([N + 0.45], [bm[1, j]], marker='s', mfc='white', mec=COL[int(N)], ms=6, ls='none', mew=1.4)
-ax2.plot([], [], marker='^', mfc='white', mec='k', ms=7, ls='none', label='$m=2$, captured + baryons')
+ax2.plot([], [], marker='^', color='k', ms=7, ls='none', label='$m=2$, with hot remainder (range over $M_{200}$, $T$)')
 ax2.plot([], [], marker='s', mfc='white', mec='k', ms=6, ls='none', label='$m=3$, captured + baryons')
 ax2.plot([], [], 'o', color='k', label='$m=1$, with hot remainder (range over $M_{200}$, $T$)')
 ax2.plot([], [], 'x', color='k', label='$m=1$, captured + baryons')

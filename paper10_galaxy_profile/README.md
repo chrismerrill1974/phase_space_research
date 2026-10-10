@@ -22,8 +22,10 @@ threshold for the Euclid Q1 perturber search (Paper XI).
 - `step2b_combine_hot_remainder.py` — Adds the hot remainder
   (M_200 - M_bar - M_cap at >= T_vir) and re-solves the captured extent to
   the solar-radius datum; curves to R_200, the 100 kpc dip, enclosed
-  masses at 50 and 100 kpc. Output: `combined_halo.npz`.
-  Runtime about 2-4 minutes single-threaded (hundreds of shooting solves).
+  masses at 50 and 100 kpc. Output: `combined_halo.npz`; with `--m 2`
+  (other branches holding twice our collapsed mass per well) it reads
+  the step 2 extents for that case and writes `combined_halo_m2.npz`.
+  Runtime about 2-5 minutes single-threaded (hundreds of shooting solves).
 - `step3_perturber_profile.py` — Reproduces Paper VI's convergence table
   and 1.08 per lens, and Paper VIII's 312-system row (three gates), then
   the ISF perturber as a Hernquist spheroid under two extent scalings, the

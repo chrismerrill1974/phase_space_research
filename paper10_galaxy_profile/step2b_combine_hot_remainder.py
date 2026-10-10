@@ -29,8 +29,14 @@ Sagittarius stream M(<100 kpc) = 5.6e11 (Vasiliev+2021), and the
 weak-lensing finding of flat circular velocities to several hundred
 kpc for isolated galaxies (Mistele+2024).
 
+Branch-mass option (added 2026-10-10 after peer review): `--m 2` or
+`--m 3` runs the same combination for the chain at m = 2 or 3 (other
+branches holding m times our collapsed mass per well), reading the
+captured mass f = (N-1) eps_inf(N) m and the step 2 extents for that m,
+and writing to combined_halo_m{m}.npz so the m = 1 file is untouched.
+
 Inputs:  ../data/hydrostatic_halo.npz (step 1), ../data/dissipated_component.npz (step 2)
-Output:  ../data/combined_halo.npz
+Output:  ../data/combined_halo.npz (m = 1) or ../data/combined_halo_m{m}.npz
 Runtime: a few minutes, single-threaded (hundreds of shooting solves at
 0.2 dex scan resolution); hand off if it grows beyond that.
 """
@@ -38,6 +44,7 @@ Runtime: a few minutes, single-threaded (hundreds of shooting solves at
 import os
 import sys
 import time
+import argparse
 import numpy as np
 from scipy.integrate import solve_ivp
 from scipy.optimize import brentq
@@ -46,7 +53,11 @@ T0 = time.time()
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 DATA = os.path.join(ROOT, 'data')
-OUTPATH = os.path.join(DATA, 'combined_halo.npz')
+_ap = argparse.ArgumentParser(description='captured component + hot remainder')
+_ap.add_argument('--m', type=int, default=1, choices=[1, 2, 3],
+                 help='collapsed mass per other branch, in units of ours (default 1)')
+M_BRANCH = _ap.parse_args().m
+OUTPATH = os.path.join(DATA, 'combined_halo.npz' if M_BRANCH == 1 else f'combined_halo_m{M_BRANCH}.npz')
 
 G = 4.30091e-6
 H0 = 67.4
@@ -131,8 +142,12 @@ h1 = np.load(os.path.join(DATA, 'hydrostatic_halo.npz'))
 h2 = np.load(os.path.join(DATA, 'dissipated_component.npz'))
 assert bool(h1['level0_pass']) and bool(h2['gate_eps']) and bool(h2['gate_step1']), "upstream gates"
 N_ALL = h2['N_GRID'].astype(int)
-F_AVAIL = h2['f_avail_m1']
-RH_PRED = h2['rh_pred']
+if M_BRANCH == 1:
+    F_AVAIL = h2['f_avail_m1']
+    RH_PRED = h2['rh_pred']
+else:
+    F_AVAIL = h2['f_avail_m1'] * M_BRANCH
+    RH_PRED = h2['rh_pred_m23'][M_BRANCH - 2]     # row 0 is m = 2, row 1 is m = 3
 VC_DATUM = float(h2['vc_solar_datum'][0])
 sel = np.isfinite(RH_PRED)
 N_GRID = N_ALL[sel]; F_GRID = F_AVAIL[sel]; RH_GRID = RH_PRED[sel]
@@ -142,7 +157,7 @@ R_EVAL = np.array([8.178, 30.0, 50.0, 100.0, 200.0])
 R0 = R_EVAL[0]
 DATA_TO_TEST = {"M(<50 kpc) Orphan-Chenab": 3.77e11, "M(<100 kpc) Sagittarius": 5.6e11}
 
-print("Paper X step 2b — captured component + hot remainder")
+print(f"Paper X step 2b — captured component + hot remainder, m = {M_BRANCH}")
 print(f"  N, f, r_half from step 2: " + ", ".join(f"N={n}: f={f:.2f}, r_half={rh:.1f} kpc" for n, f, rh in zip(N_GRID, F_GRID, RH_GRID)))
 
 # ── Pass 1: captured extent fixed; does the gas pile in? ────────────
@@ -238,7 +253,7 @@ for i, N in enumerate(N_GRID):
           f"| [{r200.min():.2f}, {r200.max():.2f}]            | [{m50_p2[i][ok].min()/1e11:.2f}, {m50_p2[i][ok].max()/1e11:.2f}]      "
           f"| [{m100_p2[i][ok].min()/1e11:.2f}, {m100_p2[i][ok].max()/1e11:.2f}]")
 
-np.savez(OUTPATH, N_GRID=N_GRID, F_GRID=F_GRID, RH_GRID=RH_GRID, M200_GRID=M200_GRID,
+np.savez(OUTPATH, m_branch=M_BRANCH, N_GRID=N_GRID, F_GRID=F_GRID, RH_GRID=RH_GRID, M200_GRID=M200_GRID,
          T_GRID=T_GRID, R_EVAL=R_EVAL, R_PROF=R_PROF, vc8_p1=vc8_p1, fgas30_p1=fgas30_p1,
          rh_p2=rh_p2, beta_p2=beta_p2, vc_p2=vc_p2, vc200_p2=vc200_p2, m50_p2=m50_p2,
          m100_p2=m100_p2, fgas30_p2=fgas30_p2, prof_p2=prof_p2, vc_datum=VC_DATUM,
