@@ -32,14 +32,17 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 ### Paper VI: Galaxy-Mass Dark Substructure from Strong Lensing: A Parameter-Free Test of Independent Structure Formation
 - **Zenodo:** https://zenodo.org/records/18637044
 - **Summary:** Derives parameter-free predictions for ISF dark perturbers detectable via strong gravitational lensing. Predicts ~1.08 detectable dark perturbers per lens sightline (10^10-10^12 solar masses) with a Schechter-shaped mass function. Provides partial explanation (63%) for the Meneghetti galaxy-galaxy strong lensing anomaly. Forecasts ~4,000 detectable ISF perturbers with Euclid.
+- **Erratum (2026-10-11):** the per-lens integral omits the Jacobian 1/1.4 of its abundance matching, so the count is 0.77 per lens, not 1.08, and the Euclid forecast ~2,900, not ~4,000; the text's Schechter parameters are corrected to the script's. Profiles, bound masses and the Meneghetti explanation are unchanged. See `errata/papers_vi_viii_jacobian/`.
 
 ### Paper VII: Joint Weak Lensing and Strong Lensing Substructure Constraints on ISF Cross-Branch Correlation Parameters -- A Euclid Forecast for Decisive Falsification
 - **Zenodo:** https://zenodo.org/records/18644812
 - **Summary:** Presents the first joint constraint from weak lensing (KiDS-1000 band powers) and strong lensing substructure. Joint best-fit: N = 10, k_t = 1.32 h/Mpc apparent (0.52 h/Mpc physical after Limber correction), with Delta chi^2 = -53.6 vs LCDM (~7.3 sigma equivalent). Euclid forecast shows 33 sigma discrimination between N=2 and N=6; if no ISF substructure is detected, all ISF models are excluded at > 62 sigma.
+- **Erratum (2026-10-11):** the forecast's calibration constant inherits Paper VI's missing Jacobian: C_sub = 0.367, not 0.514; the fiducial expectation is 2,893 detections (was 4,050), the all-ISF falsification threshold 1,307 (was 1,844), the N = 2 vs 6 discrimination 28 sigma (was 33), the null exclusion > 52 sigma (was > 62); in the ISF-true scenario the posterior splits between N = 6 and N = 8 instead of collapsing onto N = 6. The joint fit (N = 10, k_t = 0.52 h/Mpc physical) is unchanged. Corrected product: `data/paper7/euclid_forecast_v2.npz`. See `errata/papers_vi_viii_jacobian/`.
 
 ### Paper VIII: Anchoring the Falsification Forecast to Measured Euclid Q1 Strong-Lens Demographics
 - **Zenodo:** https://zenodo.org/records/21195841
 - **Summary:** Replaces the three assumed survey inputs of Paper VII's Euclid forecast (75,000 grade-A/B lenses, flat eta = 0.05) with quantities measured from the public Q1 Strong Lensing Discovery Engine catalogue (497 grade-A/B candidates at 7.88/deg^2; Einstein-radius median 0.88"). The recalibrated forecast is robust and slightly strengthened: 4,463-5,955 expected fiducial detections (vs 4,050 assumed), with the all-ISF 95% falsification threshold rising from 1,844 to 2,037-2,733 detections. Staging over real release dates shows DR1 falsifies (a null search excludes all ISF at >= 24 sigma) but cannot confirm (an ISF-true count leaves the posterior at N=10; only the full wide survey collapses it to N=6). A perturber search of the 312 already-modelled Q1 systems would exclude N >= 6 at >= 5 sigma if null.
+- **Erratum (2026-10-11):** with Paper VI's missing Jacobian corrected, the wide-survey expectation is 3,188-4,253 (was 4,463-5,955), the all-ISF threshold 1,444-1,939 (was 2,037-2,733), the DR1 null exclusion >= 20 sigma (was >= 24), and the 312-system test 9.0-12.0 expected perturbers with a null excluding N >= 6 at 4.2-4.9 sigma (was 12.6-16.8 at 5.0-5.8). "DR1 falsifies but cannot confirm" stands; the wide-survey P(N = 6) is 0.64-0.95 (was 0.97-1.00). The demographics are unchanged. Corrected product: `data/paper8/recalibrated_forecast_v2.npz`. See `errata/papers_vi_viii_jacobian/`.
 
 ### Paper IX: Black Holes as Branch-Blind Objects -- A Gravitational-Capture Origin for the ISF Cross-Branch Correlation
 - **Zenodo:** https://zenodo.org/records/21209225
@@ -66,7 +69,9 @@ phase_space_research/
 |       |-- lnL_sub_grid.npz           # Substructure likelihood grid
 |       |-- joint_constraint.npz       # Joint constraint results
 |       |-- euclid_forecast.npz        # Euclid forecast predictions
+|       |-- euclid_forecast_v2.npz     # Same, with the Jacobian corrected (erratum, 2026-10-11)
 |   |-- paper8/                   # Precomputed data products (Paper VIII)
+|       |-- recalibrated_forecast_v2.npz  # Recalibrated forecast with the Jacobian corrected (erratum)
 |       |-- q1_demographics.npz        # Q1 SLDE demographics (rates, theta_E)
 |       |-- recalibrated_forecast.npz  # Recalibrated forecast grids
 |   |-- paper9/                   # Data products (Paper IX)
@@ -176,6 +181,13 @@ phase_space_research/
 |   |-- step5_sparc_mw_mass_slopes.py    # SPARC outer slopes, Milky-Way-mass spirals
 |   |-- step5b_sparc_per_galaxy_chain.py # The chain per SPARC galaxy (main test)
 |   |-- step4_figures.py                 # Paper figures
+|
+|-- errata/
+|   |-- papers_vi_viii_jacobian/  # Erratum to Papers VI-VIII (2026-10-11): the missing Jacobian
+|       |-- step0_audit_jacobian.py      # Audit: reproduce Paper VI, correct it, Schechter sets
+|       |-- step1_paper7_forecast_v2.py  # Paper VII forecast rerun -> euclid_forecast_v2.npz
+|       |-- step2_paper8_forecast_v2.py  # Paper VIII forecast rerun -> recalibrated_forecast_v2.npz
+|       |-- erratum_vi_viii.tex, .pdf    # The erratum note
 ```
 
 ---

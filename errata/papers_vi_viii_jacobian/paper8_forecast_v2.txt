@@ -1,0 +1,42 @@
+Erratum VI-VIII — Level 2: Paper VIII recalibrated forecast with the Jacobian
+========================================================================
+
+GATE: published recalibrated_forecast.npz reproduced from the v1 input (99 arrays): PASS
+
+Input N_det per lens: N=2: 0.514 -> 0.367, N=3: 0.771 -> 0.551, N=4: 0.926 -> 0.661, N=6: 1.080 -> 0.771, N=8: 1.152 -> 0.823, N=10: 1.203 -> 0.860
+Effective eta over the Q1 theta_E distribution (unchanged): flat 0.0500, linear 0.0407, area 0.0375
+Stages (grade A/B lenses, unchanged): Q1 497, DR1 14965, Wide 110269
+
+Stage table, old -> new:
+   stage     eta         n_exp(N=6)       sig(2v6)     sig(4v6)      null(N=2)      null(N=6)           P(N=6)
+      Q1    flat     26.8 ->    19.2    2.7 ->   2.3   0.7 ->  0.6    5.1 ->   4.3    7.3 ->   6.2   0.000 ->  0.000
+      Q1  linear     21.8 ->    15.6    2.4 ->   2.1   0.7 ->  0.6    4.6 ->   3.9    6.6 ->   5.6   0.000 ->  0.000
+      Q1    area     20.1 ->    14.4    2.3 ->   2.0   0.6 ->  0.5    4.4 ->   3.7    6.3 ->   5.4   0.000 ->  0.000
+     DR1    flat    808.1 ->   577.2   14.9 ->  12.6   4.1 ->  3.4   27.7 ->  23.4   40.2 ->  34.0   0.001 ->  0.000
+     DR1  linear    657.4 ->   469.6   13.4 ->  11.4   3.7 ->  3.1   25.0 ->  21.1   36.3 ->  30.6   0.001 ->  0.000
+     DR1    area    605.7 ->   432.7   12.9 ->  10.9   3.5 ->  3.0   24.0 ->  20.3   34.8 ->  29.4   0.000 ->  0.000
+    Wide    flat   5954.5 ->  4253.2   40.4 ->  34.2  11.0 ->  9.3   75.3 ->  63.6  109.1 ->  92.2   0.999 ->  0.949
+    Wide  linear   4844.1 ->  3460.1   36.5 ->  30.8   9.9 ->  8.4   67.9 ->  57.4   98.4 ->  83.2   0.986 ->  0.761
+    Wide    area   4463.2 ->  3188.0   35.0 ->  29.6   9.5 ->  8.1   65.2 ->  55.1   94.5 ->  79.8   0.967 ->  0.635
+      P7    flat   4050.0 ->  2892.9   33.3 ->  28.2   9.1 ->  7.7   62.1 ->  52.5   90.0 ->  76.1   0.922 ->  0.475
+
+Headline brackets over the three eta models:
+  Wide fiducial expectation n_exp(N=6):   4,463-5,955 -> 3,188-4,253
+  Wide all-ISF (N>=2) 95% threshold:     2,037-2,733 -> 1,444-1,939
+  Wide N>=4 95% threshold:               3,706-4,966 -> 2,632-3,529
+    Q1 all-ISF (N>=2) 95% threshold:        5-7 -> 3-5;  N>=4: 11-15 -> 7-10
+   DR1 all-ISF (N>=2) 95% threshold:        257-348 -> 180-244;  N>=4: 476-643 -> 335-453
+    Q1 null exclusion of N=2 (min over eta): 4.4 -> 3.7 sigma;  N=6: 6.3 -> 5.4
+   DR1 null exclusion of N=2 (min over eta): 24.0 -> 20.3 sigma;  N=6: 34.8 -> 29.4
+  Wide null exclusion of N=2 (min over eta): 65.2 -> 55.1 sigma;  N=6: 94.5 -> 79.8
+  DR1 ISF-true P(N=6) over eta:           0.001 -> 0.000, 0.001 -> 0.000, 0.000 -> 0.000
+  DR1 N=4 vs 6 discrimination over eta:   4.1 -> 3.4, 3.7 -> 3.1, 3.5 -> 3.0
+
+Q1 in-principle bound (312 modelled grade-A/B systems), old -> new:
+  flat   : eff. sightlines   15.6 (unchanged);  n_exp(N=6)  16.8 ->  12.0;  null excl N=2 4.0 -> 3.4, N=6 5.8 -> 4.9, N=10 6.1 -> 5.2 sigma
+  linear : eff. sightlines   12.7 (unchanged);  n_exp(N=6)  13.7 ->   9.8;  null excl N=2 3.6 -> 3.1, N=6 5.2 -> 4.4, N=10 5.5 -> 4.7 sigma
+  area   : eff. sightlines   11.7 (unchanged);  n_exp(N=6)  12.6 ->   9.0;  null excl N=2 3.5 -> 2.9, N=6 5.0 -> 4.2, N=10 5.3 -> 4.5 sigma
+  n_exp(N=6) bracket: 12.6-16.8 -> 9.0-12.0;  N=6 null sigma: 5.0-5.8 -> 4.2-4.9
+  Paper X consistency: Paper X's corrected N=6 count 0.756 per lens vs this 0.771.
+
+/Users/chris/Documents/phase_space/dark_matter_predictions_8/data/recalibrated_forecast_v2.npz exists and matches this run (not rewritten)

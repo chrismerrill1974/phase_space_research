@@ -1,0 +1,378 @@
+\documentclass[twocolumn,11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{enumitem}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\newcommand{\lcdm}{$\Lambda$CDM}
+\newcommand{\Msun}{M_\odot}
+\newcommand{\einf}{\varepsilon_\infty}
+\newcommand{\Ndet}{N_{\rm det}}
+\newcommand{\Csub}{C_{\rm sub}}
+
+\begin{document}
+
+\title{Erratum to ISF Papers VI, VII and VIII:\\
+a missing Jacobian in the per-lens perturber count\\[0.3em]
+\large Every detectable-perturber count in the three papers is high by
+a factor 1.4, every Poisson significance by $\sqrt{1.4}$; the joint
+weak-lensing fit, the profiles and the falsification logic stand}
+
+\author{Christopher K.\ Merrill\\[0.3em]
+{\small With computational collaboration from Claude Fable 5.1 (Anthropic)}}
+\date{October 11, 2026}
+
+\maketitle
+
+\begin{abstract}
+Paper VI of the Independent Structure Formation (ISF) series counts the
+other-branch galaxies detectable per strong-lens sightline by
+integrating a stellar mass function, written per dex of stellar mass,
+over the logarithm of halo mass. The conversion between the two carries
+the Jacobian $d\log M_\ast/d\log M_{\rm halo}$, which for the paper's
+single power-law abundance matching is the constant $1/1.4$, and the
+script omitted it. Every quantity downstream of that integral is
+therefore high by exactly 1.4: Paper VI's $1.08$ detectable perturbers
+per lens at $N=6$ is $0.77$; Paper VII's calibration constant
+$\Csub=0.514$ is $0.367$ and its per-lens counts at $N=2$--10 fall from
+$0.51$--$1.20$ to $0.37$--$0.86$; Paper VII's fiducial Euclid
+expectation of 4,050 detections is 2,893 and its all-ISF falsification
+threshold of 1,844 is 1,307; Paper VIII's wide-survey expectation of
+4,463--5,955 is 3,188--4,253, its threshold of 2,037--2,733 is
+1,444--1,939, its DR1 null exclusion of $\geq24\sigma$ is
+$\geq20\sigma$, and its 312-system in-principle test of 12.6--16.8
+expected perturbers at 5.0--5.8$\sigma$ is 9.0--12.0 at 4.2--4.9$\sigma$.
+Nothing is strengthened and nothing is fatal; the series' falsification
+statements are restated here with the corrected numbers. One
+qualitative statement does change: in the ISF-true forecast scenario the
+weaker Euclid term no longer collapses the posterior onto the $N=6$
+that generated the mock, which splits between $N=6$ and $N=8$. The
+audit also found that Paper VI's text quotes Schechter parameters its
+script does not use; the published numbers come from the script's
+parameters, and the text is corrected to them. Paper VII's joint
+weak-lensing plus substructure fit ($N=10$, $k_t^{\rm phys}=0.52\,h\,{\rm
+Mpc}^{-1}$), Paper VI's convergence profiles and bound-mass table, Paper
+IX, and Paper X's own counts are untouched. Every number here is
+printed by a committed script.
+\end{abstract}
+
+\section{The error}
+\label{sec:error}
+
+Paper VI \citep{paper6} counts the detectable other-branch galaxies
+per strong-lens sightline as
+\begin{equation}
+\begin{split}
+\Ndet=\int_{10}^{12}(N-1)\bigl[1-\varepsilon(k_M)\bigr]\,
+\Phi\bigl(M_\ast(M_{\rm halo})\bigr)\\
+\times\,V\;d\log_{10}M_{\rm halo},
+\end{split}
+\label{eq:integral}
+\end{equation}
+with $\Phi$ the stellar mass function per dex of \emph{stellar} mass,
+evaluated at the abundance-matched stellar mass
+$M_\ast=10^{10.7}(M_{\rm halo}/10^{12}\,\Msun)^{1/1.4}$, and the sum
+taken over $d\log M_{\rm halo}$. Paper VI's equation for $dn_{\rm ISF}/d\log_{10}M$ calls
+$\Phi_{\rm gal}(M)$ ``the galaxy halo mass function (converted from
+the stellar mass function via the stellar-to-halo mass relation)''.
+That conversion is
+\begin{equation}
+\frac{dn}{d\log M_{\rm halo}}=\frac{dn}{d\log M_\ast}\,
+\frac{d\log M_\ast}{d\log M_{\rm halo}}
+=\Phi(M_\ast)\,\frac{1}{1.4},
+\end{equation}
+and the script that produced the published numbers omits the second
+factor. Because the matching relation is a single power law the factor
+is a constant, so every quantity downstream of Eq.~\ref{eq:integral}
+is high by exactly 1.4 and every Poisson significance built on it by
+$\sqrt{1.4}=1.18$. Reproducing Paper VI's functions with its exact
+constants gives the published $1.0806$ per lens at $N=6$,
+$\einf=0.58$ (and $1.80$, $2.57$ at $\einf=0.30$, $0$) to three parts
+in $10^4$; with the Jacobian the same code gives $0.772$, $1.287$,
+$1.838$, a ratio of $1.3996$.
+
+The omission was found during the peer review of Paper X
+\citep{paper10} on 2026-10-10, confirmed the same day against Paper
+VI's text and script, and declared in Paper X as its concession~6.
+Paper X gates on Paper VI as published and its own perturber counts use
+a mapping with unit Jacobian, so they do not change (Section~\ref{sec:paperx}).
+
+\section{The Schechter parameters}
+\label{sec:schechter}
+
+The audit found a second discrepancy that the erratum must settle.
+Paper VI's text quotes a single Schechter function with
+$\Phi^\ast=0.012\;{\rm Mpc^{-3}\,dex^{-1}}$,
+$\log_{10}M_\ast^{\rm char}=10.7$ and $\alpha_S=-1.05$, attributed to
+\citet{baldry12}. The script that produced the published numbers uses
+$\Phi^\ast=3.96\times10^{-3}$, $\log_{10}M_\ast^{\rm char}=10.7$,
+$\alpha_S=-1.16$. Neither is \citet{baldry12} as published, which is a
+double Schechter with $\log_{10}M_\ast^{\rm char}=10.66$,
+$\Phi_1^\ast=3.96\times10^{-3}$, $\alpha_1=-0.35$,
+$\Phi_2^\ast=0.79\times10^{-3}$, $\alpha_2=-1.47$. Table~\ref{tab:schechter}
+gives the per-lens count each set produces. The text's parameters
+would have given 2.65 per lens, 2.4 times the published value, so the
+discrepancy is not cosmetic. The correction is to the text: Paper VI's
+Schechter equation should read $\Phi^\ast=3.96\times10^{-3}\;{\rm Mpc^{-3}\,dex^{-1}}$,
+$\log_{10}M_\ast^{\rm char}=10.7$, $\alpha_S=-1.16$, a single-Schechter
+approximation whose normalisation and characteristic mass follow
+\citet{baldry12} and whose low-mass slope is an intermediate value.
+The double Schechter as published would give $0.49$ per lens with the
+Jacobian, 37 percent below the corrected $0.77$. That is a model change,
+not an erratum; it is reported here as a check and not adopted, and a
+future version of the series may take it up.
+
+\begin{table*}
+\centering
+\caption{Detectable perturbers per lens at $N=6$, $\einf=0.58$, under
+the three Schechter parameter sets, without and with the Jacobian. The
+published 1.08 is the script set without it; the corrected value is
+the script set with it.}
+\label{tab:schechter}
+\small
+\begin{tabular}{lcc}
+\toprule
+parameter set & no Jacobian & with Jacobian \\
+\midrule
+text ($\Phi^\ast$ 0.012, $\alpha_S$ $-1.05$)        & 2.647 & 1.891 \\
+script ($3.96\times10^{-3}$, $-1.16$)               & \textbf{1.081} & \textbf{0.772} \\
+Baldry et al.\ (2012) double Schechter              & 0.681 & 0.486 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Corrected numbers}
+\label{sec:numbers}
+
+Tables~\ref{tab:p6}--\ref{tab:p8} list every number the three papers
+quote from the affected chain, published beside corrected. The Paper VII
+and VIII values come from rerunning the papers' own forecast scripts on
+the corrected per-lens counts, after each rerun first reproduced the
+published data product from the published input to a relative
+$10^{-9}$. The corrected products are published beside the originals as
+\texttt{euclid\_forecast\_v2.npz} and
+\texttt{recalibrated\_forecast\_v2.npz}; the originals are not altered.
+
+\begin{table*}
+\centering
+\caption{Paper VI. $N_{\rm sub}$, the bound-subhalo channel, is
+$3.2\times10^{-4}$ per lens and stays negligible. The published
+Euclid row used 1.081 rounded; the corrected row is from the script.}
+\label{tab:p6}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcc}
+\toprule
+quantity & published & corrected \\
+\midrule
+$\Ndet$ per lens, $\einf=0.58$ (abundance table)   & 1.08 & 0.77 \\
+$\Ndet$ per lens, $\einf=0.30$             & 1.80 & 1.29 \\
+$\Ndet$ per lens, $\einf=0.00$             & 2.57 & 1.84 \\
+ratio to the CDM baseline 0.43             & $2.5\times$ & $1.8\times$ \\
+combined $N_{\rm total}$ per lens (LOS table) & 1.13 & 0.82 \\
+combined $f_{\rm LOS}$ / $f_{\rm sub}$     & 98.5 / 1.5\% & 98.0 / 2.0\% \\
+LOS-fraction shift from \lcdm              & 31.5 points & 31.0 points \\
+Euclid, $\einf=0.58$: per lens / 75,000 / 5\% & 1.081 / 81,075 / 4,054 & 0.772 / 57,904 / 2,895 \\
+Euclid, $\einf=0.30$                       & 1.801 / 135,075 / 6,754 & 1.287 / 96,506 / 4,825 \\
+abstract: ``$\sim$4,000 at $>50\sigma$''   & 4,054 at 90$\sigma$ & 2,895 at 76$\sigma$ \\
+2,500 imaging-suitable lenses              & 2,701 & 1,930 \\
+criterion (1): $>$1,000 lenses, $\eta=0.05$ & 10.4$\sigma$ & 8.8$\sigma$ \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}
+\centering
+\caption{Paper VII, Section 6 (75,000 grade-A/B lenses, $\eta=0.05$,
+$10^{8.8}\,\Msun$). Unchanged: $\einf(N)$, $f_{\rm GGSL}$, the joint
+fit, and the current $P(N)$.}
+\label{tab:p7}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcc}
+\toprule
+quantity & published & corrected \\
+\midrule
+$\Csub$                                       & 0.514 & 0.367 \\
+$\Ndet$ per lens, $N=2/3/4$                   & 0.51 / 0.77 / 0.93 & 0.37 / 0.55 / 0.66 \\
+$\Ndet$ per lens, $N=6/8/10$                  & 1.08 / 1.15 / 1.20 & 0.77 / 0.82 / 0.86 \\
+expected detections, $N=2$ to 10              & 1,929--4,513 & 1,378--3,223 \\
+fiducial $N=6$: $n_{\rm exp}$, Poisson $\sigma$ & 4,050, 63.6 & 2,893, 53.8 \\
+fractional precision on $\Ndet$               & 1.6\% & 1.9\% \\
+ISF-true: $N=2$ / 3 / 4 from $N=6$            & 33.3 / 18.2 / 9.1$\sigma$ & 28.2 / 15.4 / 7.7$\sigma$ \\
+ISF-true: $N=8$ / 10 from $N=6$               & 4.2 / 7.3$\sigma$ & 3.6 / 6.1$\sigma$ \\
+ISF-true: $P(N=6)$, $P(N=8)$                  & 0.92, 0.08 & 0.47, 0.52 \\
+ISF-true joint best fit                       & $N=6$, $k_t=0.79$ & $N=8$, $k_t=1.08$ \\
+null: $N=2$ / 6 / 10 excluded at              & 62 / 90 / 95$\sigma$ & 52 / 76 / 80$\sigma$ \\
+null: min $\Delta\chi^2$ vs \lcdm             & 3,859 & 2,757 \\
+95\% threshold, all ISF ($N\geq2$)            & $<$1,844 & $<$1,307 \\
+95\% threshold, $N\geq4$                      & $<$3,358 & $<$2,384 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}
+\centering
+\caption{Paper VIII (measured Q1 demographics; brackets over the flat,
+linear and area efficiency models). Unchanged: the effective
+efficiencies 0.050 / 0.041 / 0.038, the stages Q1 497, DR1 14,965,
+Wide 110,269, and the 312-system effective sightlines 15.6 / 12.7 /
+11.7.}
+\label{tab:p8}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcc}
+\toprule
+quantity & published & corrected \\
+\midrule
+Wide $n_{\rm exp}(N=6)$                      & 4,463--5,955 & 3,188--4,253 \\
+Wide 95\% threshold, all ISF                 & 2,037--2,733 & 1,444--1,939 \\
+Wide 95\% threshold, $N\geq4$                & 3,706--4,966 & 2,632--3,529 \\
+Wide ISF-true $P(N=6)$                       & 0.967--0.999 & 0.635--0.949 \\
+Wide null $\sigma(N=2)$                      & 65.2--75.3 & 55.1--63.6 \\
+DR1 $n_{\rm exp}(N=6)$                       & 606--808 & 433--577 \\
+DR1 95\% threshold, all ISF                  & 257--348 & 180--244 \\
+DR1 null $\sigma(N=2)$ / $\sigma(N=6)$       & $\geq24.0$ / $\geq34.8$ & $\geq20.3$ / $\geq29.4$ \\
+DR1 ISF-true $P(N=6)$                        & $\sim10^{-3}$ & $\sim10^{-3}$ \\
+DR1 $\sigma(4\,{\rm v}\,6)$                  & 3.5--4.1 & 3.0--3.4 \\
+Q1 $n_{\rm exp}(N=6)$                        & 20--27 & 14--19 \\
+312 systems: $n_{\rm exp}(N=6)$              & 12.6--16.8 & 9.0--12.0 \\
+312 systems, zero found: $N\geq6$ excluded at & 5.0--5.8$\sigma$ & 4.2--4.9$\sigma$ \\
+312 systems: $N=10$ excluded at              & 5.3--6.1$\sigma$ & 4.5--5.2$\sigma$ \\
+312 systems: all $N\geq2$ excluded at        & 3.5--4.0$\sigma$ & 2.9--3.4$\sigma$ \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{What changes qualitatively}
+\label{sec:qualitative}
+
+Two statements do not survive as written; both concern the ISF-true
+forecast scenario, in which a mock Euclid count generated at $N=6$ is
+added to the current joint fit.
+
+\textbf{Paper VII, Section 6.1.} ``$P(N=6)=0.92$ (up from
+$9\times10^{-6}$ currently)'' and ``the current WL-dominated posterior
+($N=10$ preferred) shifts decisively to $N=6$'' are wrong after the
+correction. With the smaller count the Euclid term separates $N=6$ from
+$N=8$ by 3.6$\sigma$ rather than 4.2, which no longer overrides the
+current fit's preference for $N=8$--10: the corrected posterior is
+$P(N=6)=0.47$, $P(N=8)=0.52$, $P(N=10)=3\times10^{-4}$, with the joint
+best fit at $N=8$. The forecast still excludes $N\leq4$ and $N=10$ at
+the mock; the claim weakens from ``Euclid collapses the $N$ posterior''
+to ``Euclid narrows it to $N=6$--8''.
+
+\textbf{Paper VIII, abstract and Section 4.} ``Only the full wide
+survey collapses the posterior onto the truth ($P(N=6)=0.97$--$1.00$)''
+becomes $P(N=6)=0.64$--$0.95$: the wide survey still prefers $N=6$,
+decisively under the flat efficiency model and no longer decisively
+under the linear and area models. The companion statement, that DR1
+falsifies but cannot confirm, survives unchanged in form: the DR1 null
+exclusion stays above 20$\sigma$ and the DR1 ISF-true $P(N=6)$ stays
+near $10^{-3}$.
+
+Everything else is a rescaling. ``DR1 is decisive for falsification''
+holds at $\geq20\sigma$; ``the 312 already-modelled Q1 systems suffice
+for a first real-data test'' holds at $\geq4.2\sigma$ for $N\geq6$,
+which no longer reaches the 5$\sigma$ the abstract quoted, and at
+2.9--3.4$\sigma$ for all $N\geq2$.
+
+\section{What is unchanged}
+\label{sec:unchanged}
+
+Verified by reading the code and, where a product exists, by byte
+comparison after the reruns:
+\begin{itemize}[leftmargin=1.4em,itemsep=0.1em]
+\item Paper VII's joint weak-lensing plus substructure fit: the
+  substructure likelihood uses the Meneghetti excess factor
+  $f_{\rm GGSL}=3[1+(N-1)(1-\einf)]$, not Eq.~\ref{eq:integral}; the
+  per-lens count appears in that script only in a printed cross-check.
+  The best fit $N=10$, $k_t^{\rm app}=1.32$, $k_t^{\rm phys}=0.52\,h\,{\rm
+  Mpc}^{-1}$, $\Delta\chi^2=-53.6$, the Limber analysis and the current
+  $P(N)$ stand; \texttt{joint\_constraint.npz} and
+  \texttt{lnL\_sub\_grid.npz} were not rewritten.
+\item Paper VI's convergence profiles, the 38 percent convergence
+  excess at the Einstein radius, the bound-mass table, the
+  $\varepsilon$-versus-mass relation, the Meneghetti partial
+  explanation (excess factor, not the integral), the \lcdm\ baselines
+  of 0.43 and 0.05 per lens, the sub-galactic contribution below 1
+  percent, and the scorecard's test outcomes other than the counts.
+  Falsification criteria (2)--(6) are unchanged; criterion (1)'s
+  significance falls from 10.4 to 8.8$\sigma$ and stays above 5.
+\item Paper VIII's demographics: the 497 grade-A/B candidates, the
+  7.88 per square degree rate, the 110,269 wide-survey lenses, the
+  $\theta_E$ distribution and the efficiency models.
+\item Paper IX entirely.
+\item Paper X (Section~\ref{sec:paperx}).
+\end{itemize}
+
+\section{Falsification statements, restated}
+\label{sec:falsification}
+
+\textbf{Paper VI, criterion (1).} Absence of the $10^{10}$--$10^{12}\,\Msun$
+Schechter excess in a sample of more than 1,000 lenses at 5 percent
+efficiency would falsify ISF at more than $5\sigma$ (8.8$\sigma$ at
+$N=6$; was 10.4).
+
+\textbf{Paper VII.} If Euclid substructure counts at
+$10^{8.8}\,\Msun$ yield fewer than 1,307 detections across 75,000
+grade-A/B strong lenses (was 1,844), the ISF model is excluded at
+$>95$ percent confidence for all $N\geq2$; fewer than 2,384 (was 3,358)
+excludes $N\geq4$.
+
+\textbf{Paper VIII.} If a complete perturber search of the 312
+modelled Q1 grade-A/B systems at $10^{8.8}\,\Msun$ yields zero
+detections, ISF with $N\geq6$ is excluded at $\geq4.2\sigma$ (was
+$\geq5\sigma$) and all $N\geq2$ at $\geq2.9\sigma$ (was $\geq3.5$); if
+Euclid DR1 substructure counts fall below 180--244 detections across
+$\sim$15,000 grade-A/B lenses (was 257--348), all ISF models ($N\geq2$)
+are excluded at $>95$ percent confidence; a DR1 null excludes even
+$N=2$ at $\geq20\sigma$ (was $\geq24$).
+
+\section{Consistency with Paper X}
+\label{sec:paperx}
+
+Paper X replaces Paper VI's intact-NFW perturber with the captured
+spheroid its own chain derives and maps perturber mass to number with
+a unit Jacobian. Its corrected per-lens count at $N=6$ with the extent
+held, 0.756, sits beside the Jacobian-corrected 0.771 here: at $N=6$
+Paper X's threshold change was this correction in disguise, the profile
+effect being nil there. Its 312-system expectation for the registered
+$m=1$ model with the extent held, 8.8--11.8, sits beside the corrected
+9.0--12.0. Paper X's headline numbers are for the $m=2$--3 family and
+are not affected; its concession~6 and its Table~3 row ``VIII, $N=6$''
+(1.080; 16.8 / 13.7 / 12.6; 5.8 / 5.2 / 5.0) now read 0.771; 12.0 / 9.8 /
+9.0; 4.9 / 4.4 / 4.2.
+
+\section{Reproducibility}
+
+The audit and the two reruns are three scripts of a few hundred lines,
+each gated on reproducing the published product before it prints a
+corrected number, published with the series' analysis code in the
+\texttt{errata/} folder of the public repository together with the two
+\texttt{\_v2} data products. The published Zenodo records of Papers VI
+\citep{paper6}, VII \citep{paper7} and VIII \citep{paper8} receive new
+versions carrying this note; the record numbers the series cites stay
+valid.
+
+\begin{thebibliography}{}
+\bibitem[Baldry et al.(2012)]{baldry12} Baldry, I.~K., et al.\ 2012,
+MNRAS, 421, 621
+\bibitem[Merrill(2025)]{paper6} Merrill, C.~K.\ 2025, ISF Paper VI,
+Galaxy-Mass Dark Substructure from Strong Lensing: A Parameter-Free Test of Independent Structure Formation, Zenodo,
+doi:10.5281/zenodo.18637044
+\bibitem[Merrill(2026a)]{paper7} Merrill, C.~K.\ 2026a, ISF Paper VII:
+Joint Weak Lensing and Strong Lensing Substructure Constraints on ISF Cross-Branch Correlation Parameters, Zenodo,
+doi:10.5281/zenodo.18644812
+\bibitem[Merrill(2026b)]{paper8} Merrill, C.~K.\ 2026b, ISF Paper VIII:
+Anchoring the Falsification Forecast to Measured Euclid Q1 Strong-Lens
+Demographics, Zenodo, doi:10.5281/zenodo.21195841
+\bibitem[Merrill(2026c)]{paper10} Merrill, C.~K.\ 2026c, ISF Paper X:
+The Galaxy-Scale Dark Mass Profile Under Independent Structure
+Formation, Zenodo, doi:10.5281/zenodo.23286778
+\end{thebibliography}
+
+\end{document}

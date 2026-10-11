@@ -1,0 +1,64 @@
+Erratum VI-VIII — Level 1: Paper VII Euclid forecast with the Jacobian
+========================================================================
+
+GATE: published euclid_forecast.npz reproduced at C_sub = 0.5143 (21 arrays): PASS
+
+C_sub: 0.5143 -> 0.3673  (Paper VI per lens at N = 6: 1.08 -> 0.771)
+
+Per-lens count and expected Euclid detections (75000 lenses, eta = 0.05):
+    N   eps | N_det old N_det new | N_Euclid old N_Euclid new
+    2  0.00 |     0.514     0.367 |         1929         1378
+    3  0.25 |     0.771     0.551 |         2893         2066
+    4  0.40 |     0.926     0.661 |         3471         2480
+    6  0.58 |     1.080     0.771 |         4050         2893
+    8  0.68 |     1.152     0.823 |         4320         3086
+   10  0.74 |     1.203     0.860 |         4513         3223
+  text range N = 2..10: 1,929-4,513 -> 1,378-3,223
+
+ISF-true scenario (fiducial N = 6):
+  expected detections n_exp: 4050 -> 2893
+  Poisson sigma sqrt(n):     63.6 -> 53.8
+  sigma(N_det/lens):         0.01697 -> 0.01434
+  fractional precision:      1.6% -> 1.9%
+    N | sigma from N=6 old    new
+    2 |               33.3   28.2
+    3 |               18.2   15.4
+    4 |                9.1    7.7
+    8 |                4.2    3.6
+   10 |                7.3    6.1
+  joint+Euclid best fit: N = 6, k_t = 0.7893 -> N = 8, k_t = 1.0761
+  Dchi2 vs LCDM at best fit: -29.68 -> -30.32
+    N | P(N) current  +Euclid old  +Euclid new
+    2 |     0.000000     0.000000     0.000000
+    3 |     0.000000     0.000000     0.000000
+    4 |     0.000000     0.000000     0.000000
+    6 |     0.000009     0.922098     0.474805
+    8 |     0.006001     0.077902     0.524859
+   10 |     0.993991     0.000000     0.000336
+
+Null scenario (zero ISF perturbers), exclusion sigma = sqrt(2 n_model):
+    N | n_model old     new | sigma old    new
+    2 |        1929    1378 |        62     52
+    3 |        2893    2066 |        76     64
+    4 |        3471    2480 |        83     70
+    6 |        4050    2893 |        90     76
+    8 |        4320    3086 |        93     79
+   10 |        4513    3223 |        95     80
+  min Dchi2 vs LCDM over the grid: 3858.9 -> 2756.9 (>> 62 -> 53 sigma)
+
+Falsification thresholds (95 percent; observed N_det/lens below this excludes that N):
+    N | N_det_min old      new | total old    new
+    2 |        0.4918   0.3485 |      1844   1307
+    3 |        0.7438   0.5278 |      2789   1979
+    4 |        0.8954   0.6357 |      3358   2384
+    6 |        1.0473   0.7438 |      3927   2789
+    8 |        1.1182   0.7943 |      4193   2979
+   10 |        1.1688   0.8304 |      4383   3114
+  ALL ISF (N >= 2): fewer than 1844 -> 1307 detections
+  N >= 4:           fewer than 3358 -> 2384 detections
+
+Untouched inputs (SHA-256, for the record; git must show them unmodified):
+  a0152d0f0bac3b88fd3d7eb745ff8f158a355af1e1e4729435bcc6d1f99f794f  dark_matter_predictions_7/data/joint_constraint.npz
+  aacaadc5c2250e8e52beb2649a5d5ab68868f1db52ced8767e5f0c98e7584d0d  dark_matter_predictions_7/data/lnL_sub_grid.npz
+
+/Users/chris/Documents/phase_space/dark_matter_predictions_7/data/euclid_forecast_v2.npz exists and matches this run (not rewritten)

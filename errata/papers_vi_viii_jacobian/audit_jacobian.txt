@@ -1,0 +1,123 @@
+Erratum VI-VIII — Level 0 audit of the missing Jacobian
+========================================================================
+
+(a) GATE: reproduce Paper VI's published per-lens counts (paper6_phase2_results.json)
+    eps_inf 0.58: 1.0809 (published 1.0806);  0.30: 1.8014 (1.8009);  0.00: 2.5735 (2.5727)
+    GATE (a): PASS
+    Paper VII C_sub = 1.08 / [(6-1)(1-0.58)] = 0.5143; its N_det per lens over N = [2, 3, 4, 6, 8, 10]:
+      0.514, 0.771, 0.926, 1.080, 1.152, 1.203   reproduced from C_sub: PASS
+
+(b) With the Jacobian d log M_star / d log M_halo = 1/1.4 = 0.7143:
+    per-lens count at N = 6, eps_inf = 0.58: 0.7720  (published 1.0806; ratio 1.3996, exactly 1.4 since the matching is a single power law)
+    eps_inf 0.30: 1.2867;  0.00: 1.8382
+    Paper VII C_sub: 0.5143 -> 0.3673  (1.08/1.4 = 0.7714 per lens at N = 6)
+      N eps_inf  N_det published  N_det corrected
+      2    0.00            0.514            0.367
+      3    0.25            0.771            0.551
+      4    0.40            0.926            0.661
+      6    0.58            1.080            0.771
+      8    0.68            1.152            0.823
+     10    0.74            1.203            0.860
+    Downstream, every count divides by 1.4 and every Poisson significance by sqrt(1.4) = 1.183;
+    the Levels 1-2 reruns give the exact values (eta caps make Paper VIII's not a pure ratio).
+
+    Paper VI tables, published -> corrected:
+    Table 'abundance' (N_det per lens; N_sub is 3.2e-4 x 1/1.4 and stays negligible):
+      Conservative  eps 0.58: 1.08 -> 0.77
+      Optimistic    eps 0.30: 1.80 -> 1.29
+      Maximum       eps 0.00: 2.57 -> 1.84
+    '2.5x the CDM detectable baseline of ~0.43': 2.50x -> 1.78x
+    Table 'los' combined column: N_total/lens 1.13 -> 0.82; f_LOS 98.5% -> 98.0%; f_sub 1.5% -> 2.0%; shift from LCDM 31.5 -> 31.0 points
+    Table 'euclid' (per lens / x 75,000 grade A/B / x 5 percent):
+      ISF eps 0.58: 1.081 / 81,041 / 4,052 -> 0.772 / 57,904 / 2,895
+      ISF eps 0.30: 1.801 / 135,069 / 6,753 -> 1.287 / 96,506 / 4,825
+    Abstract '~4,000 at >50 sigma' (2,500 lenses x 1.08 = 2,701 -> 1,930; the >50 sigma is the 75,000 x 0.05 row: sqrt(2 x 4,052) = 90 -> sqrt(2 x 2,895) = 76 sigma)
+    Criterion (1), absence in >1,000 lenses at eta 0.05: 10.4 -> 8.8 sigma (stays > 5)
+
+(c) Schechter parameter sets (per dex of stellar mass), REPORTED NOT ADOPTED:
+    text   : phi* = 0.012,   log M* = 10.70, alpha = -1.05   (paper6.tex eq. schechter, attributed to Baldry+2012)
+    script : phi* = 3.96e-3, log M* = 10.70, alpha = -1.16   (paper6_phase2_isf_predictions.py; produced the published numbers)
+    Baldry : double Schechter, log M* = 10.66, phi1 = 3.96e-3 a1 = -0.35, phi2 = 0.79e-3 a2 = -1.47 (Baldry+2012 as published)
+    log M_star       text     script     Baldry   [Mpc^-3 dex^-1]
+           9.0   3.29e-02   1.67e-02   1.15e-02
+           9.5   2.98e-02   1.33e-02   7.46e-03
+          10.0   2.45e-02   9.67e-03   5.71e-03
+          10.5   1.50e-02   5.22e-03   4.68e-03
+          11.0   3.63e-03   1.11e-03   1.84e-03
+          11.5   4.58e-05   1.24e-05   3.24e-05
+    per-lens count at N = 6, eps_inf = 0.58, no Jacobian / with Jacobian:
+      text                : 2.6470 / 1.8907
+      script              : 1.0809 / 0.7720
+      Baldry 2012 double  : 0.6807 / 0.4862
+    The published 1.08 is the script set without the Jacobian; the erratum's corrected number is the script set
+    with it. The text's parameters and the Baldry double Schechter are shown only so the discrepancy is on record.
+
+(d) Files in the Paper VI-IX workspaces naming a quantity fed by the per-lens integral
+    (hand classification into affected / unaffected is in the erratum HANDOFF.md):
+       7  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_breakdown.md
+       7  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_deliverables/paper6_phase2_breakdown.md
+      11  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_deliverables/paper6_phase2_isf_predictions.py
+       3  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_deliverables/paper6_phase2_summary.md
+       5  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_deliverables/paper6_phase2c_figures.py
+       2  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_deliverables/paper6_phase2d_profiles.py
+      11  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_isf_predictions.py
+       1  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_results.json
+       3  dark_matter_predictions_6_strong_lensing/003_phase2/paper6_phase2_summary.md
+       1  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B/files/paper6_phase2_breakdown.md
+      14  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B/files/paper6_phase2_isf_predictions.py
+       1  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B/paper6_phase2_breakdown.md
+      14  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B/paper6_phase2_isf_predictions.py
+       1  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B/paper6_phase2_results.json
+       7  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B_fix/files/paper6_phase2_breakdown.md
+      11  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B_fix/files/paper6_phase2_isf_predictions.py
+       7  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B_fix/paper6_phase2_breakdown.md
+      11  dark_matter_predictions_6_strong_lensing/003_phase2/phase2B_fix/paper6_phase2_isf_predictions.py
+       5  dark_matter_predictions_6_strong_lensing/003_phase2/phase2C/files/paper6_phase2c_figures.py
+       2  dark_matter_predictions_6_strong_lensing/003_phase2/phase2D/files/paper6_phase2d_profiles.py
+       2  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/isf_context/paper_qdm.tex
+       7  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/phase2_outputs/paper6_phase2_breakdown.md
+      11  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/phase2_outputs/paper6_phase2_isf_predictions.py
+       1  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/phase2_outputs/paper6_phase2_results.json
+       3  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/phase2_outputs/paper6_phase2_summary.md
+       5  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/phase2_outputs/paper6_phase2c_figures.py
+       2  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/phase2_outputs/paper6_phase2d_profiles.py
+       1  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/planning/HANDOFF.md
+       5  dark_matter_predictions_6_strong_lensing/004_phase3/paper6_handoff/planning/plan_paper_vi_strong_lensing_v5.md
+       2  dark_matter_predictions_6_strong_lensing/004_phase3/phase3A/files/paper6_phase3a_catalogue.md
+       1  dark_matter_predictions_6_strong_lensing/004_phase3/phase3A/files/paper6_phase3a_data.json
+       4  dark_matter_predictions_6_strong_lensing/004_phase3/phase3C/files/paper6_phase3c_meneghetti.py
+       3  dark_matter_predictions_6_strong_lensing/004_phase3/phase3C/files/paper6_phase3c_metrics.json
+       2  dark_matter_predictions_6_strong_lensing/004_phase3/phase3C/files/paper6_phase3c_narrative.md
+       1  dark_matter_predictions_6_strong_lensing/004_phase3/phase3E/files/HANDOFF_PHASE5.md
+       1  dark_matter_predictions_6_strong_lensing/004_phase3/phase3E/files/paper6_phase3e_narrative.md
+       2  dark_matter_predictions_6_strong_lensing/004_phase3/phase3E/files/paper6_phase3e_summary.json
+       9  dark_matter_predictions_6_strong_lensing/005_writeup/paper6.tex
+       5  dark_matter_predictions_6_strong_lensing/plan_paper_vi_strong_lensing_v5.md
+       3  dark_matter_predictions_7/01_work_on_plan/research_plan_paper_vii.tex
+       3  dark_matter_predictions_7/02_work_on_plan/research_plan_paper_vii.tex
+       3  dark_matter_predictions_7/03_bundle/paper7_bundle/README.md
+       1  dark_matter_predictions_7/03_bundle/paper7_bundle/paper_vi_data/paper6_phase2_results.json
+       1  dark_matter_predictions_7/03_bundle/paper7_bundle/paper_vi_data/paper6_phase3a_data.json
+       3  dark_matter_predictions_7/03_bundle/paper7_bundle/paper_vi_data/paper6_phase3c_metrics.json
+       2  dark_matter_predictions_7/03_bundle/paper7_bundle/paper_vi_data/paper6_phase3e_summary.json
+       9  dark_matter_predictions_7/03_bundle/paper7_bundle/paper_vi_reference/paper6.tex
+       3  dark_matter_predictions_7/03_bundle/paper7_bundle/plan/research_plan_paper_vii.tex
+       1  dark_matter_predictions_7/09_phase2_1/step_C2_paper_vi_consistency/step_C2_paper_vi_consistency.py
+       3  dark_matter_predictions_7/10_phase3/step3a_substructure_likelihood.py
+       8  dark_matter_predictions_7/12_phase5/paper_vii.tex
+      53  dark_matter_predictions_7/12_phase5/step5a_euclid_forecast.py
+       6  dark_matter_predictions_7/12_phase5/step5b_forecast_figure.py
+       2  dark_matter_predictions_7/HANDOFF.md
+       1  dark_matter_predictions_7/handoffs/paper7_handoff_phase2/paper_vi_data/paper6_phase2_results.json
+       1  dark_matter_predictions_7/handoffs/paper7_handoff_phase2/paper_vi_data/paper6_phase3a_data.json
+       3  dark_matter_predictions_7/handoffs/paper7_handoff_phase2/paper_vi_data/paper6_phase3c_metrics.json
+       2  dark_matter_predictions_7/handoffs/paper7_handoff_phase2/paper_vi_data/paper6_phase3e_summary.json
+       9  dark_matter_predictions_7/handoffs/paper7_handoff_phase2/paper_vi_reference/paper6.tex
+       3  dark_matter_predictions_7/handoffs/paper7_handoff_phase2/plan/research_plan_paper_vii.tex
+       3  dark_matter_predictions_7/research_plan_paper_vii.tex
+       1  dark_matter_predictions_8/00_plan/research_plan_paper_viii.md
+      19  dark_matter_predictions_8/03_forecast/step2_recalibrated_forecast.py
+       4  dark_matter_predictions_8/03_forecast/step3_figures.py
+       1  dark_matter_predictions_8/04_paper/paper_viii.tex
+       5  dark_matter_predictions_8/HANDOFF.md
+    66 files. Paper IX workspace(s) scanned: ['dark_matter_predictions_9']
