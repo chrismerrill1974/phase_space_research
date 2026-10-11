@@ -30,7 +30,7 @@ Analysis scripts and data for a series of papers testing the phase space dimensi
 - **Summary:** Tests ISF against published weak lensing measurements. The ISF power spectrum modification factor [1 + (N-1)*epsilon(k)]/N is constrained using the S8 tension. ISF models with scale-dependent epsilon(k) are preferred over constant suppression at 1.9 sigma, with best-fit parameters k_t = 0.20 h/Mpc and epsilon_inf = 0.58.
 
 ### Paper VI: Galaxy-Mass Dark Substructure from Strong Lensing: A Parameter-Free Test of Independent Structure Formation
-- **Zenodo:** https://zenodo.org/records/18637044
+- **Zenodo:** https://zenodo.org/records/23306560 (paper version 2, record version 3, 2026-10-11; all versions DOI 10.5281/zenodo.18637043; version 1: https://zenodo.org/records/18637044)
 - **Summary (version 2, 2026-10-11):** Derives parameter-free predictions for ISF dark perturbers detectable via strong gravitational lensing. Predicts ~0.77 detectable dark perturbers per lens sightline (10^10-10^12 solar masses) with a Schechter-shaped mass function. Provides partial explanation (63%) for the Meneghetti galaxy-galaxy strong lensing anomaly. Forecasts ~2,900 detectable ISF perturbers with Euclid at 5% efficiency.
 - **Version 2 corrects version 1 (2026-02-13):** the per-lens integral omitted the Jacobian 1/1.4 of its abundance matching, so version 1's 1.08 per lens and ~4,000 Euclid detections were high by exactly 1.4; the text's Schechter parameters are corrected to the ones the script uses; Figures 2, 4, 6 and 7 regenerated. Profiles, bound masses, the Meneghetti explanation and the falsification criteria are unchanged. The scripts in `paper6_strong_lensing/` are the version-2 scripts; the audit is in `errata/papers_vi_viii_jacobian/`.
 
