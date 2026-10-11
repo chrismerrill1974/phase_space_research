@@ -43,6 +43,7 @@ for key, label in (('isf_conservative', 'per lens 0.58'), ('isf_optimistic', 'pe
     checks.append((f'{label}, table', f'& {a:.2f} & \\textbf{{{a:.2f}}}', f'& {b:.2f} & \\textbf{{{b:.2f}}}'))
     sa, sb = pla(v1, key, 'N_sub_detect'), pla(v2, key, 'N_sub_detect')
     checks.append((f'{label} N_sub', f'${sa*1e4:.1f}{{\\times}}10^{{-4}}$', f'${sb*1e4:.1f}{{\\times}}10^{{-4}}$'))
+    checks.append((f'{label} N_sub, prose', f'{sa*1e4:.1f} \\times 10^{{-4}}', f'{sb*1e4:.1f} \\times 10^{{-4}}' if key == 'isf_conservative' else ''))
 a, b = pla(v1, 'isf_conservative', 'N_detect_total'), pla(v2, 'isf_conservative', 'N_detect_total')
 cdm = pla(v1, 'lcdm_baseline', 'N_sub_detectable')
 checks.append(('per lens 0.58 in prose', f'{{\\sim}}\\,{a:.2f}$', f'{{\\sim}}\\,{b:.2f}$'))
@@ -69,7 +70,7 @@ checks.append(('Schechter alpha', '\\alpha_S = -1.05$.', '\\alpha_S = -1.16$'))
 ok = True
 print(f"{'quantity':24s} {'v1 (absent?)':>36s} {'v2 (present?)':>36s}")
 for desc, s1, s2 in checks:
-    absent, present = s1 not in tex_body, s2 in tex
+    absent, present = s1 not in tex_body, (s2 in tex if s2 else True)
     ok &= absent and present
     print(f"{desc:24s} {s1:>30s} {'yes' if absent else 'NO':>5s} {s2:>30s} {'yes' if present else 'NO':>5s}")
 print("ALL CHECKS PASS" if ok else "CHECKS FAILED")
