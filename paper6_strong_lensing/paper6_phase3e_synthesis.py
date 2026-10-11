@@ -19,7 +19,8 @@ from matplotlib.patches import FancyBboxPatch
 import json
 import os
 
-OUTPUT_DIR = '/mnt/user-data/outputs'
+OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))   # version 2 (2026-10-11): this folder
+FIG_DIR = os.path.join(OUTPUT_DIR, 'figures')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 plt.rcParams.update({
@@ -40,10 +41,19 @@ metrics_d = json.load(open(os.path.join(OUTPUT_DIR, 'paper6_phase3d_metrics.json
 
 # Load Phase 2 results
 results_path = os.path.join(os.path.dirname(__file__),
-    '../paper6_handoff/phase2_outputs/paper6_phase2_results.json')
+    'paper6_phase2_results.json')
 with open(results_path) as f:
     phase2 = json.load(f)
 
+# Version 2 (2026-10-11): the numbers below come from the results file, not literals
+pla = phase2["per_lens_abundance"]
+n058 = pla["isf_conservative"]["N_detect_total"]; n030 = pla["isf_optimistic"]["N_detect_total"]
+ncdm = pla["lcdm_baseline"]["N_sub_detectable"]
+flos = phase2["los_subhalo_fraction"]["combined"]["f_LOS"]; shift = phase2["los_subhalo_fraction"]["discriminant_assessment"]["shift_percent"]
+frac7 = 100 * metrics_b["isf_fraction_at_logM7"]; frac8 = 100 * metrics_b["isf_fraction_at_logM8"]
+cross = metrics_b["logM_crossover"]; peak = metrics_b["isf_over_lcdm_at_peak"]
+_mf = phase2["mass_function"]; _lm = np.array(_mf["log_M"])
+r12 = float(np.interp(12.0, _lm, np.array(_mf["isf_eps058_dndlogM"]) / np.array(_mf["lcdm_dndlogM"])))
 print("All data loaded.")
 print("\n" + "="*70)
 print("Paper VI Phase 3E: Synthesis & Comparison Summary")
@@ -57,7 +67,7 @@ scorecard = [
     {
         'test': 'Mass function shape (10⁶–10⁹)',
         'isf_prediction': 'ISF adds <1% to ΛCDM',
-        'isf_value': f"0.15% at 10⁷, 0.91% at 10⁸",
+        'isf_value': f"{frac7:.2f}% at 10⁷, {frac8:.2f}% at 10⁸",
         'data_status': 'Constraining',
         'consistent': 'Yes',
         'discriminant': 'Weak (ISF invisible)',
@@ -67,7 +77,7 @@ scorecard = [
     {
         'test': 'Mass function shape (10¹⁰–10¹²)',
         'isf_prediction': 'Schechter bump, peak at M*≈10^10.7',
-        'isf_value': f"ISF/ΛCDM = 1.07× at peak, 4.65× at 10¹²",
+        'isf_value': f"ISF/ΛCDM = {peak:.2f}× at peak, {r12:.2f}× at 10¹²",
         'data_status': 'Untested',
         'consistent': 'Untested',
         'discriminant': 'Strong (primary)',
@@ -76,8 +86,8 @@ scorecard = [
     },
     {
         'test': 'Per-lens abundance (10¹⁰–10¹²)',
-        'isf_prediction': '1.08 detectable per lens (ε=0.58)',
-        'isf_value': f"2.5× ΛCDM detectable rate",
+        'isf_prediction': f'{n058:.2f} detectable per lens (ε=0.58)',
+        'isf_value': f"{n058/ncdm:.1f}× ΛCDM detectable rate",
         'data_status': 'Untested',
         'consistent': 'Untested',
         'discriminant': 'Strong',
@@ -107,7 +117,7 @@ scorecard = [
     {
         'test': 'LOS fraction vs mass',
         'isf_prediction': 'f_LOS → 1.0 at 10¹⁰–10¹²',
-        'isf_value': f"Combined f_LOS = 0.985 (+31.5%)",
+        'isf_value': f"Combined f_LOS = {flos:.3f} (+{shift:.1f}%)",
         'data_status': 'Untested',
         'consistent': 'Untested',
         'discriminant': 'Strong (future)',
@@ -197,26 +207,26 @@ euclid_table = {
     'grade_AB_lenses': N_grade_AB,
     'sensitivity_logM_min': 8.8,
     'isf_eps058': {
-        'N_detect_per_lens': 1.081,
-        'N_total_170k': 1.081 * N_euclid,
-        'N_total_75k': 1.081 * N_grade_AB,
-        'detection_significance': f"√(1.081 × 75000) ≈ 285σ",
+        'N_detect_per_lens': n058,
+        'N_total_170k': n058 * N_euclid,
+        'N_total_75k': n058 * N_grade_AB,
+        'detection_significance': f"√({n058:.3f} × 75000) ≈ {np.sqrt(n058 * 75000):.0f}σ",
     },
     'isf_eps030': {
-        'N_detect_per_lens': 1.801,
-        'N_total_170k': 1.801 * N_euclid,
-        'N_total_75k': 1.801 * N_grade_AB,
-        'detection_significance': f"√(1.801 × 75000) ≈ 368σ",
+        'N_detect_per_lens': n030,
+        'N_total_170k': n030 * N_euclid,
+        'N_total_75k': n030 * N_grade_AB,
+        'detection_significance': f"√({n030:.3f} × 75000) ≈ {np.sqrt(n030 * 75000):.0f}σ",
     },
     'cdm_baseline': {
-        'N_detect_per_lens_8_10': 0.433,
-        'N_total_75k': 0.433 * N_grade_AB,
+        'N_detect_per_lens_8_10': ncdm,
+        'N_total_75k': ncdm * N_grade_AB,
     },
     'realistic_efficiency': {
         'note': 'Gravitational imaging requires high S/N arcs',
         'fraction_suitable': 0.05,  # ~5% of lenses have suitable arcs
         'N_analyzable': int(N_grade_AB * 0.05),
-        'isf_eps058_realistic': 1.081 * int(N_grade_AB * 0.05),
+        'isf_eps058_realistic': n058 * int(N_grade_AB * 0.05),
         'detection_still_strong': True,
     }
 }
@@ -227,16 +237,16 @@ print(f"  Grade A/B:    {N_grade_AB:,}")
 print(f"  Sensitivity:  logM > {euclid_table['sensitivity_logM_min']}")
 
 print(f"\nISF forecast (grade A/B lenses):")
-print(f"  ε=0.58: {1.081 * N_grade_AB:,.0f} ISF perturbers "
+print(f"  ε=0.58: {n058 * N_grade_AB:,.0f} ISF perturbers "
       f"({euclid_table['isf_eps058']['detection_significance']})")
-print(f"  ε=0.30: {1.801 * N_grade_AB:,.0f} ISF perturbers "
+print(f"  ε=0.30: {n030 * N_grade_AB:,.0f} ISF perturbers "
       f"({euclid_table['isf_eps030']['detection_significance']})")
-print(f"  CDM baseline (10⁸–10¹⁰): {0.433 * N_grade_AB:,.0f}")
+print(f"  CDM baseline (10⁸–10¹⁰): {ncdm * N_grade_AB:,.0f}")
 
 N_real = euclid_table['realistic_efficiency']['N_analyzable']
 print(f"\nRealistic (5% of grade A/B suitable for grav. imaging):")
 print(f"  N_analyzable: {N_real:,}")
-print(f"  ISF (ε=0.58): {1.081 * N_real:,.0f} perturbers")
+print(f"  ISF (ε=0.58): {n058 * N_real:,.0f} perturbers")
 print(f"  Even at 5% efficiency: detection significance > 50σ")
 
 
@@ -252,7 +262,7 @@ risks = [
         'risk': 'ISF violates existing flux ratio constraints',
         'phase2_level': 'Low',
         'phase3_level': 'Negligible',
-        'reason': 'ISF adds 0.15% at 10⁷, 0.91% at 10⁸. '
+        'reason': f'ISF adds {frac7:.2f}% at 10⁷, {frac8:.2f}% at 10⁸. '
                   'Invisible to Gilman+2020 and JWST 33-lens sample.',
     },
     {
@@ -356,7 +366,7 @@ def make_figure7():
          'Schechter bump',
          'Untested', 'Untested', 'Strong'],
         ['Per-lens abundance',
-         '1.08/lens (2.5× ΛCDM)',
+         f'{n058:.2f}/lens ({n058/ncdm:.1f}× ΛCDM)',
          'Untested', 'Untested', 'Strong'],
         ['Meneghetti GGSL',
          '6.3× (63% of gap)',
@@ -430,7 +440,7 @@ def make_figure7():
             ha='left', va='top', fontsize=8.5, color='#333333',
             linespacing=1.5)
 
-    outpath = os.path.join(OUTPUT_DIR,
+    outpath = os.path.join(FIG_DIR,
                            'paper6_fig7_scorecard.png')
     fig.savefig(outpath, dpi=300, bbox_inches='tight')
     print(f"\nFigure 7 saved to {outpath}")
@@ -460,12 +470,12 @@ if __name__ == '__main__':
             'total_tests': len(scorecard),
         },
         'key_numbers': {
-            'isf_at_logM7_pct': 0.15,
-            'isf_at_logM8_pct': 0.91,
-            'isf_lcdm_crossover_logM': 10.66,
-            'isf_detect_per_lens_eps058': 1.081,
+            'isf_at_logM7_pct': round(frac7, 2),
+            'isf_at_logM8_pct': round(frac8, 2),
+            'isf_lcdm_crossover_logM': round(cross, 2),
+            'isf_detect_per_lens_eps058': round(n058, 3),
             'meneghetti_isf_pct_of_gap': 63,
-            'flos_combined': 0.985,
+            'flos_combined': round(flos, 3),
             'kappa_ratio_5kpc': 1.38,
             'euclid_lenses': 170000,
             'euclid_isf_perturbers_eps058': 184000,

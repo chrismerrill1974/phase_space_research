@@ -25,9 +25,10 @@ import sys
 
 # Import Phase 2 prediction functions
 sys.path.insert(0, os.path.join(os.path.dirname(__file__),
-    '../paper6_handoff/phase2_outputs'))
+    '.'))
 
-OUTPUT_DIR = '/mnt/user-data/outputs'
+OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))   # version 2 (2026-10-11): this folder
+FIG_DIR = os.path.join(OUTPUT_DIR, 'figures')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Publication style
@@ -49,7 +50,7 @@ plt.rcParams.update({
 # Load Phase 2 mass function data
 # ------------------------------------------------------------------
 results_path = os.path.join(os.path.dirname(__file__),
-    '../paper6_handoff/phase2_outputs/paper6_phase2_results.json')
+    'paper6_phase2_results.json')
 with open(results_path) as f:
     phase2 = json.load(f)
 
@@ -255,7 +256,7 @@ def make_figure4():
     ax.grid(True, alpha=0.15, which='major')
     ax.grid(True, alpha=0.08, which='minor')
 
-    outpath = os.path.join(OUTPUT_DIR, 'paper6_fig4_mass_function_vs_data.png')
+    outpath = os.path.join(FIG_DIR, 'paper6_fig4_mass_function_vs_data.png')
     fig.savefig(outpath, dpi=300, bbox_inches='tight')
     print(f"\nFigure 4 saved to {outpath}")
     plt.close(fig)

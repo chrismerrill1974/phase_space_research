@@ -26,7 +26,8 @@ from paper6_phase2_isf_predictions import (
     lcdm_subhalo_dndm, lensing_volume
 )
 
-OUTPUT_DIR = '/mnt/user-data/outputs'
+OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))   # version 2 (2026-10-11): this folder
+FIG_DIR = os.path.join(OUTPUT_DIR, 'figures')
 
 # =====================================================================
 # Publication style setup
@@ -135,7 +136,7 @@ def make_figure1():
     ax2.set_xlabel(r'$k$ [h/Mpc]', labelpad=8)
 
     fig.tight_layout()
-    outpath = os.path.join(OUTPUT_DIR, 'paper6_fig1_epsilon_vs_mass.png')
+    outpath = os.path.join(FIG_DIR, 'paper6_fig1_epsilon_vs_mass.png')
     fig.savefig(outpath)
     print(f"  Figure 1 saved: {outpath}")
     plt.close(fig)
@@ -258,7 +259,7 @@ def make_figure2():
               fontsize=8)
 
     fig.tight_layout()
-    outpath = os.path.join(OUTPUT_DIR, 'paper6_fig2_mass_function.png')
+    outpath = os.path.join(FIG_DIR, 'paper6_fig2_mass_function.png')
     fig.savefig(outpath)
     print(f"  Figure 2 saved: {outpath}")
     plt.close(fig)

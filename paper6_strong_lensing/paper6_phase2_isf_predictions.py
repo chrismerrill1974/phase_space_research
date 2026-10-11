@@ -11,6 +11,19 @@ Key inputs from Paper V:
   - S₈ constraint ties ε_∞ to (N, k_t, α)
 
 Author: C. Merrill, 2026
+
+VERSION 2 (2026-10-11). The version-1 script (003_phase2/) evaluated the
+stellar mass function, per dex of STELLAR mass, at the abundance-matched
+M_star(M_halo) and summed over d log M_halo without the Jacobian
+d log M_star / d log M_halo = 1/1.4 of the matching relation
+M_star = 10^10.7 (M_halo/1e12)^(1/1.4). This copy carries the Jacobian
+(JACOBIAN below, applied in isf_excess_dndm), so every per-lens count
+and ISF excess mass function is 1/1.4 of version 1. Before writing its
+results it GATES: with the Jacobian set to 1 it must reproduce the
+version-1 results file to 1e-6 in the per-lens counts. Output goes to
+this folder (paper6_phase2_results.json here is the version-2 product;
+the version-1 file in 003_phase2/ is untouched). Everything else is the
+version-1 code, unchanged.
 """
 
 import numpy as np
@@ -24,6 +37,14 @@ import os
 # =====================================================================
 
 OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))
+# The version-1 results the paper and the phase-3 scripts used (the copy in
+# 003_phase2/ is an earlier run with older key names and a 3e-4 difference).
+V1_RESULTS = os.path.join(OUTPUT_DIR, '..', '004_phase3', 'paper6_handoff', 'phase2_outputs',
+                          'paper6_phase2_results.json')
+
+# Version 2: d log M_star / d log M_halo for M_star ∝ M_halo^(1/1.4).
+# The main block sets it to 1.0 for the gate, then back to 1/1.4.
+JACOBIAN = 1.0 / 1.4
 
 
 def epsilon_sigmoid(k, k_t=0.20, eps_inf=0.58, alpha=2.0):
@@ -153,9 +174,11 @@ def isf_excess_dndm(M_halo, N=6, k_t=0.20, eps_inf=0.58, alpha=2.0,
         
         # ISF excess: (N-1) branches × (1-ε) independent fraction
         # × galaxy density × effective volume
+        # Version 2: × d log M_star / d log M_halo, since phi_gal is per
+        # dex of stellar mass and the sum runs over d log M_halo.
         excess_factor = (N - 1) * (1.0 - eps_at_M)
-        result[i] = excess_factor * phi_gal * V_lens_Mpc3
-    
+        result[i] = excess_factor * phi_gal * V_lens_Mpc3 * JACOBIAN
+
     return result
 
 
@@ -747,8 +770,28 @@ def compute_all_predictions():
 
 
 if __name__ == '__main__':
+    # ── Version 2 GATE: with the Jacobian off, reproduce version 1 ──
+    with open(V1_RESULTS) as f:
+        v1 = json.load(f)
+    JACOBIAN = 1.0
+    gate_results = compute_all_predictions()
+    gate_ok = True
+    print("VERSION 2 GATE (Jacobian = 1 must reproduce 004_phase3/paper6_handoff/phase2_outputs/paper6_phase2_results.json):")
+    for key in ('isf_conservative', 'isf_optimistic', 'isf_maximum'):
+        a = v1['per_lens_abundance'][key]['N_detect_total']
+        b = gate_results['per_lens_abundance'][key]['N_detect_total']
+        ok = abs(a - b) < 1e-6
+        gate_ok &= ok
+        print(f"  {key:16s}: v1 {a:.6f}  reproduced {b:.6f}  {'PASS' if ok else 'FAIL'}")
+    if not gate_ok:
+        raise SystemExit("version 2 gate failed")
+    JACOBIAN = 1.0 / 1.4
+    print(f"  GATE PASS; now with the Jacobian = {JACOBIAN:.4f}\n")
+
     print("Computing ISF substructure predictions (Phase 2A + 2B)...")
     results = compute_all_predictions()
+    results['version'] = {'version': 2, 'date': '2026-10-11', 'jacobian': JACOBIAN,
+                          'note': 'd log M_star / d log M_halo applied in isf_excess_dndm; version 1 omitted it'}
 
     outfile = os.path.join(OUTPUT_DIR, 'paper6_phase2_results.json')
 
