@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
-Paper VIII — Step 2: Recalibrated ISF falsification forecast
+Paper VIII — Step 2: Recalibrated ISF falsification forecast — VERSION 2 (2026-10-11)
+
+Version 1 read Paper VII's per-lens counts, which inherited Paper VI's
+missing Jacobian 1/1.4 (Papers VI and VII, version 2). This copy reads
+Paper VII's version-2 product (euclid_forecast_v2.npz) and writes
+recalibrated_forecast_v2.npz beside the version-1 product. It gates: the
+input counts must equal version 1's times 1/1.4, and an existing v2
+product must match this run (it is never rewritten). Everything else is
+the version-1 code, unchanged.
 
 Reruns the Paper VII Phase 5a Poisson forecast with the assumed survey
 inputs replaced by measured Euclid Q1 demographics:
@@ -38,10 +46,12 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 DATA = os.path.join(ROOT, 'data')
 P7 = os.path.join(DATA, 'from_paper_vii')
-OUTPATH = os.path.join(DATA, 'recalibrated_forecast.npz')
+OUTPATH = os.path.join(DATA, 'recalibrated_forecast_v2.npz')   # version 2 product
+V1PATH = os.path.join(DATA, 'recalibrated_forecast.npz')      # version 1 product
 
 demo = np.load(os.path.join(DATA, 'q1_demographics.npz'), allow_pickle=True)
-fc7 = np.load(os.path.join(P7, 'euclid_forecast.npz'), allow_pickle=True)
+fc7 = np.load(os.path.join(P7, 'euclid_forecast_v2.npz'), allow_pickle=True)   # Paper VII version 2
+fc7_v1 = np.load(os.path.join(P7, 'euclid_forecast.npz'), allow_pickle=True)   # version 1, for the gate
 jc = np.load(os.path.join(P7, 'joint_constraint.npz'), allow_pickle=True)
 sub = np.load(os.path.join(P7, 'lnL_sub_grid.npz'), allow_pickle=True)
 
@@ -186,5 +196,23 @@ for m, (a_q1, n_exp_q1, sig_q1) in q1_inprinciple.items():
     save[f'q1ip_{m}_a'] = a_q1
     save[f'q1ip_{m}_n_exp'] = n_exp_q1
     save[f'q1ip_{m}_sig_null'] = sig_q1
-np.savez(OUTPATH, **save)
-print(f"\nSaved {OUTPATH}")
+save['jacobian'] = 1.0 / 1.4
+
+# ── Version 2 GATES ───────────────────────────────────────────────
+g1 = np.allclose(fc7['N_det_per_lens'], fc7_v1['N_det_per_lens'] / 1.4, rtol=1e-12, atol=0)
+print(f"\nVERSION 2 GATE 1: input N_det per lens = version 1 x 1/1.4: {'PASS' if g1 else 'FAIL'}")
+if not g1:
+    raise SystemExit("gate 1 failed")
+if os.path.exists(OUTPATH):
+    prev = np.load(OUTPATH, allow_pickle=True)
+    common = [k for k in prev.files if k in save]
+    g2 = all(np.array_equal(prev[k], save[k]) if np.asarray(prev[k]).dtype.kind in 'US'
+             else np.allclose(np.asarray(prev[k], dtype=float), np.asarray(save[k], dtype=float), rtol=1e-12, atol=0)
+             for k in common)
+    print(f"VERSION 2 GATE 2: existing {os.path.basename(OUTPATH)} matches this run on {len(common)} arrays: "
+          f"{'PASS (not rewritten)' if g2 else 'FAIL: archive it and rerun'}")
+    if not g2:
+        raise SystemExit("gate 2 failed")
+else:
+    np.savez(OUTPATH, **save)
+    print(f"\nSaved {OUTPATH}")

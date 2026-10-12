@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Paper VIII — Step 3: Figures
+Paper VIII — Step 3: Figures — VERSION 2 (2026-10-11): reads
+recalibrated_forecast_v2.npz (Papers VI and VII version 2, the Jacobian
+corrected) and writes to this folder's figures/. Otherwise version 1.
 
 Fig 1: Q1 Einstein-radius distribution (grade A/B, modelled) with the
        three detection-efficiency models overlaid.
@@ -23,10 +25,10 @@ import matplotlib.pyplot as plt
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 DATA = os.path.join(ROOT, 'data')
-FIGDIR = os.path.join(ROOT, 'figures')
+FIGDIR = os.path.join(SCRIPT_DIR, 'figures')   # version 2: this folder's figures/
 
 demo = np.load(os.path.join(DATA, 'q1_demographics.npz'), allow_pickle=True)
-rc = np.load(os.path.join(DATA, 'recalibrated_forecast.npz'), allow_pickle=True)
+rc = np.load(os.path.join(DATA, 'recalibrated_forecast_v2.npz'), allow_pickle=True)   # version 2 product
 jc = np.load(os.path.join(DATA, 'from_paper_vii', 'joint_constraint.npz'),
              allow_pickle=True)
 
@@ -92,8 +94,8 @@ thr_lo = min(rc[f'Wide_{m}_thr95_total'][0] for m in ('flat', 'linear', 'area'))
 thr_hi = max(rc[f'Wide_{m}_thr95_total'][0] for m in ('flat', 'linear', 'area'))
 ax.fill_between([1.7, 2.3], [thr_lo] * 2, [thr_hi] * 2, color='crimson',
                 alpha=0.35, label='95% all-ISF exclusion (Wide)')
-ax.axhline(1844, color='grey', ls=':', lw=1.2,
-           label='Paper VII threshold (1844)')
+ax.axhline(1307, color='grey', ls=':', lw=1.2,   # version 2: Paper VII version 2's threshold
+           label='Paper VII threshold (1307)')
 
 ax.set_yscale('log')
 ax.set_xticks(x)
@@ -126,7 +128,7 @@ ax.set_xticks(xN)
 ax.set_xticklabels([str(N) for N in N_grid])
 ax.set_xlabel('N (branch count)')
 ax.set_ylabel('marginalised P(N)')
-ax.set_title('Posterior collapse by survey stage (ISF-true scenario)')
+ax.set_title('Posterior by survey stage (ISF-true scenario)')   # version 2: no longer a collapse
 ax.legend(fontsize=8)
 save(fig, 'fig3_PN_stages')
 
