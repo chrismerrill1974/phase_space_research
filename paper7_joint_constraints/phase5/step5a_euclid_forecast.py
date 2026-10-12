@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
-Paper VII — Phase 5a: Euclid Forecast
+Paper VII — Phase 5a: Euclid Forecast — VERSION 2 (2026-10-11)
+
+Version 1 calibrated C_sub from Paper VI's 1.08 detectable perturbers per
+lens, which omitted the Jacobian 1/1.4 of its abundance matching (see
+Paper VI version 2). This copy applies it (JACOBIAN below), writes
+euclid_forecast_v2.npz beside the version-1 product, and gates: its
+per-lens counts must equal the version-1 product's times 1/1.4, and if a
+v2 product already exists it must match this run (it is never rewritten).
+Everything else is the version-1 code, unchanged.
 
 Constructs Fisher forecast for Euclid substructure counts
 (~170,000 strong lenses, ~75,000 grade A/B) and shows how the
@@ -30,7 +38,8 @@ DATA_DIR = os.path.join(REPO_ROOT, 'data')
 
 JOINT_PATH = os.path.join(DATA_DIR, 'joint_constraint.npz')
 SUB_PATH = os.path.join(DATA_DIR, 'lnL_sub_grid.npz')
-OUTPATH = os.path.join(DATA_DIR, 'euclid_forecast.npz')
+OUTPATH = os.path.join(DATA_DIR, 'euclid_forecast_v2.npz')   # version 2 product, beside the original
+V1PATH = os.path.join(DATA_DIR, 'euclid_forecast.npz')      # version 1 product (gate)
 
 for label, path in [('Joint constraint', JOINT_PATH), ('Sub grid', SUB_PATH)]:
     if not os.path.isfile(path):
@@ -74,7 +83,10 @@ M_threshold_log = 8.8   # O'Riordan+2022: 10^(8.8) M_sun
 # where C_sub is the integral over the Schechter mass function * detection volume
 # From Paper VI: N_det = 1.08 at N=6, eps_inf=0.58
 # So C_sub = 1.08 / [(6-1)(1-0.58)] = 1.08 / 2.10 = 0.5143
-C_sub = 1.08 / ((6 - 1) * (1 - 0.58))
+# Version 2 (2026-10-11): Paper VI's 1.08 omitted the Jacobian d log M_star / d log M_halo = 1/1.4
+# of its abundance matching (Paper VI version 2); the calibration carries it here.
+JACOBIAN = 1.0 / 1.4
+C_sub = 1.08 * JACOBIAN / ((6 - 1) * (1 - 0.58))
 
 N_det_per_lens = np.zeros(n_N)
 for iN, (N, eps) in enumerate(zip(N_grid, eps_inf_grid)):
@@ -369,8 +381,7 @@ print(f"""
 # ══════════════════════════════════════════════════════════════════
 print("[Saving checkpoint...]")
 
-np.savez(
-    OUTPATH,
+save = dict(
     # Grid axes
     N_grid=N_grid,
     eps_inf_grid=eps_inf_grid,
@@ -398,7 +409,26 @@ np.savez(
     chi2_current_joint=jc['chi2_joint_grid'],
     dchi2_current=dchi2_current,
     chi2_lcdm=chi2_lcdm,
+    jacobian=JACOBIAN,
+    C_sub_published=1.08 / ((6 - 1) * (1 - 0.58)),
 )
 
-print(f"  Saved to {OUTPATH}")
-print("\nPhase 5a complete.")
+# ── Version 2 GATES ───────────────────────────────────────────────
+v1 = np.load(V1PATH, allow_pickle=True)
+g1 = np.allclose(save['N_det_per_lens'], v1['N_det_per_lens'] * JACOBIAN, rtol=1e-12, atol=0)
+print(f"VERSION 2 GATE 1: N_det per lens = version 1 x 1/1.4: {'PASS' if g1 else 'FAIL'}")
+if not g1:
+    raise SystemExit("gate 1 failed")
+if os.path.exists(OUTPATH):
+    prev = np.load(OUTPATH, allow_pickle=True)
+    common = [k for k in prev.files if k in save]
+    g2 = all(np.allclose(np.asarray(prev[k], dtype=float), np.asarray(save[k], dtype=float), rtol=1e-12, atol=0)
+             for k in common)
+    print(f"VERSION 2 GATE 2: existing {os.path.basename(OUTPATH)} matches this run on {len(common)} arrays: "
+          f"{'PASS (not rewritten)' if g2 else 'FAIL: archive it and rerun'}")
+    if not g2:
+        raise SystemExit("gate 2 failed")
+else:
+    np.savez(OUTPATH, **save)
+    print(f"  Saved to {OUTPATH}")
+print("\nPhase 5a (version 2) complete.")

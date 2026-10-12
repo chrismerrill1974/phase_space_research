@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Paper VII — Phase 5b: Forecast Figure
+Paper VII — Phase 5b: Forecast Figure — VERSION 2 (2026-10-11): reads
+euclid_forecast_v2.npz (Jacobian-corrected, see step5a) and writes to
+this folder's figures/; the ISF-true annotation says the posterior narrows
+to N = 6-8 rather than collapsing onto N = 6. Otherwise version 1.
 
 Produces two key figures:
 
@@ -37,11 +40,11 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 DATA_DIR = os.path.join(REPO_ROOT, 'data')
-FIG_DIR = os.path.join(REPO_ROOT, 'figures')
+FIG_DIR = os.path.join(SCRIPT_DIR, 'figures')   # version 2 (2026-10-11): this folder's figures/
 os.makedirs(FIG_DIR, exist_ok=True)
 
 jc = np.load(os.path.join(DATA_DIR, 'joint_constraint.npz'), allow_pickle=True)
-ec = np.load(os.path.join(DATA_DIR, 'euclid_forecast.npz'), allow_pickle=True)
+ec = np.load(os.path.join(DATA_DIR, 'euclid_forecast_v2.npz'), allow_pickle=True)   # version 2 product
 
 N_grid = jc['N_grid']
 eps_inf_grid = jc['eps_inf_grid']
@@ -162,7 +165,7 @@ for ax, (dchi2, title, cmap) in zip(axes, [
 axes[0].set_ylabel(r'$N$ (branch count)')
 
 # Annotations on Euclid panel
-axes[1].annotate('Euclid collapses\nN posterior to N=6',
+axes[1].annotate('Euclid narrows\nN posterior to N=6-8',
                  xy=(np.log10(k_t_grid[15]), 3), fontsize=8, ha='center',
                  bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.8))
 
@@ -206,7 +209,7 @@ ax.set_title(r'Marginalised $P(N)$: current vs Euclid forecast')
 # Annotate key features
 ax.annotate(f'P(N=6) = {ec["P_N_euclid_isf"][3]:.2f}',
             xy=(3 + width, ec['P_N_euclid_isf'][3]),
-            xytext=(4.2, 0.5), fontsize=8,
+            xytext=(1.6, 2e-3), fontsize=8,   # version 2: placed below the bars, clear of the legend and the N = 10 bars
             arrowprops=dict(arrowstyle='->', color='#27ae60'),
             color='#27ae60')
 
