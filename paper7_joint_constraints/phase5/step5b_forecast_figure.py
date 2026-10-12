@@ -3,7 +3,9 @@
 Paper VII — Phase 5b: Forecast Figure — VERSION 2 (2026-10-11): reads
 euclid_forecast_v2.npz (Jacobian-corrected, see step5a) and writes to
 this folder's figures/; the ISF-true annotation says the posterior narrows
-to N = 6-8 rather than collapsing onto N = 6. Otherwise version 1.
+to N = 6-8 rather than collapsing onto N = 6. Otherwise version 1. (The
+list below says four figures; the script also writes the WL dchi2
+profiles figure, five in all, as version 1 did.)
 
 Produces two key figures:
 
